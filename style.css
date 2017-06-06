@@ -1,3 +1,49 @@
+/* Title font */
+/*
+  font-family: 'Bungee Inline', cursive;
+*/
+h1 {
+  text-align: center;
+  font-family: 'Holtwood One SC', serif;
+  font-size: 250%;
+  background: black;
+  color: #FFD300;
+}
+
+h2 {
+  text-align: center;
+  font-size: 150%;
+  background-color: black;
+  color: #FFD300;
+}
+
+div.title {
+  position: absolute;
+  top: 90px;
+  left: 0;
+  right: 0;
+  background-color: black;
+}
+
+div.body {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 250px;
+}
+
+div.campSlides {
+  position: absolute;
+  top: 400px;
+  left: 50px;
+}
+
+/* Slide Shows */
+img.campSlidex { 
+  display:none;
+}
+
+/* Roster and Schedules  */
 .roster  .schedule{
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
@@ -52,7 +98,7 @@ th.schedule {
 }
 
 body {
-  background-color: #FFD600;
+  background-color: white;
 }
 
 #logo {
