@@ -1,25 +1,129 @@
-.roster {
+.roster  .schedule{
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
   width: 9%;
 }
 
-td.roster {
-  border: 1px solid #ddd;
+td {
+  border: 0px solid #ddd;
   padding: 8px;
 }
 
-tr:nth-child.roster(even){background-color: #f2f2f2;}
+tr:nth-child(even){
+  background-color: gray;
+  color: #FFD300; 
+}
 
-tr.roster:hover {background-color: #ddd;}
+tr:hover {
+  background-color: black;
+  color: #FFD300; 
+}
 
 th.roster {
-  border: 1px solid #ddd;
+  border: 0px solid #ddd;
   padding: 8px;
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
   background-color: gold;
-  color: white;
+  color: black;
 }
 
+th.schedule {
+  border: 0px solid #ddd;
+  padding: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  text-align: left;
+  background-color: gold;
+  color: black;
+}
+
+.topnav {
+  overflow: visible;
+  background-color: black;
+  width: 100%;
+  height: 90px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  border-bottom: 0px solid black;
+}
+
+body {
+  background-color: #FFD600;
+}
+
+#logo {
+ margin: 10px;
+ float: left;
+ width: 45px;
+ height: 72px;
+ background: url(img/coyote-small.png) no-repeat center;
+ display: block;
+}
+
+.dropdownmenu {
+  overflow: visible;
+  background-color: black;
+}
+
+.dropdownmenu ul, .dropdownmenu li {
+	margin: 0;
+	padding: 0;
+}
+.dropdownmenu ul {
+	list-style: none;
+	width: 100%;
+}
+.dropdownmenu li {
+	float: left;
+	position: relative;
+	width:auto;
+}
+.dropdownmenu a {
+	background: black;
+	color: #FFD300;;
+	display: block;
+	font: bold 12px/20px sans-serif;
+	padding: 10px 25px;
+	text-align: left;
+	text-decoration: none;
+	-webkit-transition: all .25s ease;
+	-moz-transition: all .25s ease;
+	-ms-transition: all .25s ease;
+	-o-transition: all .25s ease;
+	transition: all .25s ease;
+}
+.dropdownmenu li:hover a {
+	background: #FFD300;
+   color: black;
+}
+#submenu {
+	left: 0;
+	opacity: 0;
+	position: absolute;
+	top: 35px;
+	visibility: hidden;
+	z-index: 1;
+}
+li:hover ul#submenu {
+	opacity: 1;
+	top: 40px;	/* adjust this as per top nav padding top & bottom comes */
+	visibility: visible;
+   background: #FFD300;
+   color: black;
+}
+#submenu li {
+	float: none;
+	width: 100%;
+}
+#submenu a:hover {
+	background: #FFD300;
+   color: black;
+}
+#submenu a {
+	background-color: black;
+   color: #FFD300;
+}

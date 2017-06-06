@@ -30,7 +30,6 @@ function initClient() {
   });
 }
 
-
 function generateTable(dataArray, tableClass, id) {
   // pass in two dimensional array for rows/columns
   // TODO: pass in title, table name
@@ -69,7 +68,6 @@ function generateTable(dataArray, tableClass, id) {
   dvTable.appendChild(table);
 }
 
-
 /**
  * Append a pre element to the body containing the given message
  * as its text node. Used to display the results of the API call.
@@ -82,7 +80,6 @@ function appendPre(message) {
   pre.appendChild(textContent);
 }
 
-
 /**
  * Print the names and majors of students in a sample spreadsheet:
  * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit/#gid=58192009
@@ -90,16 +87,14 @@ function appendPre(message) {
 // TODO: Might want to make this more generic
 //       Add table name, and range, spreadsheetId, key)
 function listRoster(team, spreadSheetId) {
-  listTable(String(team) + '-ROSTER', spreadSheetId, 'A1:D')
+  listTable(String(team) + '-ROSTER', spreadSheetId, 'roster', 'A1:D')
 }
-
 
 function listSchedule(team, spreadSheetId) {
-  listTable(String(team) + '-SCHEDULE', spreadSheetId, 'A1:F')
+  listTable(String(team) + '-SCHEDULE', spreadSheetId, 'schedule', 'A1:F')
 }
 
-
-function listTable(pagename, spreadSheetId, range) {
+function listTable(pagename, spreadSheetId, tableClass, range) {
   rosterRange = pagename + '!' + range;
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
@@ -117,7 +112,7 @@ function listTable(pagename, spreadSheetId, range) {
         }
         dataArray.push(dataRow);
       }
-      generateTable(dataArray, 'roster', 'tableId');
+      generateTable(dataArray, tableClass, 'tableId');
     } else {
       appendPre('No roster is available');
     }

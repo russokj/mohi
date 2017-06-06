@@ -4,12 +4,12 @@
     <title>Monarch High School Girls Basketball</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset='utf-8' />
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <link rel="shortcut icon" type="image/png" href="image/coyote.png" />
+    <link rel="stylesheet" type="text/css" href="style2.css" />
+    <link rel="shortcut icon" type="image/png" href="img/coyote.png" />
   </head>
   <body>
     <center>MONARCH GIRLS BASKETBALL</center>
-    <img  src="image/coyote.png" alt="Monarch Coyote" width="223" height="360">
+    <img  src="img/coyote.png" alt="Monarch Coyote" width="223" height="360">
     <br>
     2016-17 Varsity
     <br>
@@ -45,8 +45,8 @@
           apiKey: 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw',
           scope: SCOPES
         }).then(function () {
-	  // For now, just print a roster - later on we will select
-	  listRoster('2016', 'A');
+          // For now, just print a roster - later on we will select
+          listRoster('A');
         }, function(reason) {
           alert('Error: ' + reason.result.error.message);
         });
@@ -108,13 +108,13 @@
        */
       // TODO: Might want to make this more generic
       //       Add table name, and range, spreadsheetId, key)
-      function listRoster(year, team) {
-        pagename = String(year) + String(team)
+      function listRoster(team) {
+        pagename = String(team) + '-ROSTER'
         rosterRange = pagename + '!A1:D';
         gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI',
-	  key: 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw',
-	  range: rosterRange
+          key: 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw',
+          range: rosterRange
         }).then(function(response) {
           var range = response.result;
           if (range.values.length > 0) {

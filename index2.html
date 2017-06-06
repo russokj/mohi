@@ -52,9 +52,9 @@
           authorizeButton.onclick = handleAuthClick;
           signoutButton.onclick = handleSignoutClick;
         }).then(function(response) {
-          alert(response.result.data);
+          console.log(response.result.data);
         }, function(reason) {
-          alert('Error: ' + reason.result.error.message);
+          console.log('Error: ' + reason.result.error.message);
         });
         alert("Leaving initClient");
       }

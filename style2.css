@@ -1,0 +1,31 @@
+.roster {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 9%;
+}
+
+td.roster {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+tr.roster:nth-child(even){
+  background-color: gray;
+  color: #FFD300; 
+}
+
+tr.roster:hover {
+  background-color: black;
+  color: #FFD300; 
+}
+
+th.roster {
+  border: 1px solid #ddd;
+  padding: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: gold;
+  color: black;
+}
+
