@@ -1,0 +1,42 @@
+/* Roster and Schedules  */
+
+.roster  .schedule{
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 9%;
+}
+
+td {
+  border: 0px solid #ddd;
+  padding: 8px;
+}
+
+tr:nth-child(even){
+  background-color: gray;
+  color: #FFD300; 
+}
+
+tr:hover {
+  background-color: black;
+  color: #FFD300; 
+}
+
+th.roster {
+  border: 0px solid #ddd;
+  padding: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: gold;
+  color: black;
+}
+
+th.schedule {
+  border: 0px solid #ddd;
+  padding: 2px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  text-align: left;
+  background-color: gold;
+  color: black;
+}

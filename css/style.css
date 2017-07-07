@@ -1,0 +1,62 @@
+/* Title font */
+/*
+  font-family: 'Holtwood One SC', serif;
+*/
+
+h1 {
+  text-align: center;
+  font-family: 'Bungee Inline', cursive;
+  font-size: 250%;
+  background-color: black;
+  color: #FFD300;
+}
+
+h2 {
+  text-align: center;
+  font-size: 150%;
+  background-color: black;
+  color: #FFD300;
+}
+
+div.normalDiv {
+  margin-top: 10px;
+}
+
+div.marginDiv {
+  margin-top: 40px;
+}
+
+/* Slide Shows */
+img.campSlidex { 
+  display:none;
+}
+
+.topnav {
+  overflow: visible;
+  background-color: black;
+  color: #FFD300;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  border-bottom: 0px solid black;
+}
+
+.topbody {
+  margin-top: 150px;
+  padding: 20px;
+}
+
+body {
+  background-color: white;
+}
+
+#logo {
+ margin: 10px;
+ float: left;
+ width: 45px;
+ height: 72px;
+ background: url(../img/coyote-small.png) no-repeat center;
+ display: block;
+}
