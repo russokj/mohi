@@ -11,6 +11,8 @@
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="stylesheet" type="text/css" href="css/table.css" />
 
+    <script type="text/javascript" src="js/scripts.js"></script>
+
     <!-- Menu includes -->
     <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script> 
     <script type="text/javascript" src="js/menu.js"></script>
@@ -24,23 +26,23 @@
     <script type="text/javascript" src="js/table.js"></script>
   </head>
 
-  <body>
+  <body onload="javascript:onload()">
     <div id="content">
       <header id="topnav">
         <a href="#" id="logo"></a>
         <nav class="rmm style">
           <ul>
-            <li><a href="#">HOME</a></li>
+            <li><a href="index.html?page=home">HOME</a></li>
             <li><a href="#">SCHEDULE & EVENTS</a>
               <ul>
                 <li><a href="#">Practices</a></li>
                 <li><a href="#">Games</a></li>
-                <li><a href="#">Team Events</a></li>
+                <li><a href="index.html?page=events">Team Events</a></li>
               </ul>
             </li>
             <li><a href="#">ROSTERS</a>
               <ul>
-                <li><a href="#">Varsity</a></li>
+                <li><a href="index.html?page=varsity">Varsity</a></li>
                 <li><a href="#">JV</a></li>
                 <li><a href="#">C-Team</a></li>
               </ul>
@@ -73,17 +75,30 @@
 
       <main id="topbody">
         <div class="normalDiv">
-        <h3><center>Summer Basketball Camp</center></h3>
-Come be a Monarch Coyote for a week! Monarch Youth Girls Basketball Camp June 12th, 14th, & 16th 9am to 12noon... $50 (best price in town... Or $20 per day if less then three days)... Contact Shelli Reading by PM at (303) 681-6639 or shelli.reading@comcast.net (payment and registration taken first day of camp starting at 8:30am June 12th 2017). 3rd grade through 8th graders. Awwwwooooo! Sko Lady Yotes!
-        </div>
-        <div class="marginDiv"/>
-        <div class="normalDiv" style="max-width:500px">
-          <img class="campSlide" src="img/camp-2017/18813527_10213038171609733_2915847240093515502_n.jpg", style="width:100%">
-          <img class="campSlide" src="img/camp-2017/18835515_10213037985005068_9205531587062894073_n.jpg", style="width:100%">
-          <img class="campSlide" src="img/camp-2017/18835628_10213037984445054_758294256082516724_n.jpg", style="width:100%">
-          <img class="campSlide" src="img/camp-2017/18835767_10213037982885015_6414244938050855363_n.jpg", style="width:100%">
-          <img class="campSlide" src="img/camp-2017/18839110_10213037982645009_5173662158805618987_n.jpg", style="width:100%">
-          <img class="campSlide" src="img/camp-2017/18882068_10213037983645034_3125838694678090191_n.jpg", style="width:100%">
+          <div class="menuDiv" id="varsity">
+            This is The Roster
+          </div>
+          <div class="menuDiv" id="home">
+            This is The Home
+          </div>
+          <div class="menuDiv" id="events">
+            <h3><center>Summer Basketball Camp</center></h3>
+            Come be a Monarch Coyote for a week! Monarch Youth Girls Basketball
+            Camp June 12th, 14th, & 16th 9am to 12noon... $50 (best price in
+            town... Or $20 per day if less then three days)... Contact Shelli
+            Reading by PM at (303) 681-6639 or shelli.reading@comcast.net (payment
+            and registration taken first day of camp starting at 8:30am June 12th
+            2017). 3rd grade through 8th graders. Awwwwooooo! Sko Lady Yotes!
+            <div class="marginDiv"/>
+            <div class = "normalDiv" style="max-width:500px">
+              <img class="campSlide" src="img/camp-2017/18813527_10213038171609733_2915847240093515502_n.jpg", style="width:100%">
+              <img class="campSlide" src="img/camp-2017/18835515_10213037985005068_9205531587062894073_n.jpg", style="width:100%">
+              <img class="campSlide" src="img/camp-2017/18835628_10213037984445054_758294256082516724_n.jpg", style="width:100%">
+              <img class="campSlide" src="img/camp-2017/18835767_10213037982885015_6414244938050855363_n.jpg", style="width:100%">
+              <img class="campSlide" src="img/camp-2017/18839110_10213037982645009_5173662158805618987_n.jpg", style="width:100%">
+              <img class="campSlide" src="img/camp-2017/18882068_10213037983645034_3125838694678090191_n.jpg", style="width:100%">
+            </div>
+          </div>
         </div>
       </main>
     </body>
