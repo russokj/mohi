@@ -26,37 +26,54 @@ div.marginDiv {
   margin-top: 40px;
 }
 
+p {
+  margin-bottom: 1em;
+}
+
 /* Slide Shows */
-img.campSlidex { 
+img.campSlidex {
   display:none;
 }
 
-.topnav {
-  overflow: visible;
-  background-color: black;
-  color: #FFD300;
+html, body, #content {
   width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  border-bottom: 0px solid black;
-}
-
-.topbody {
-  margin-top: 150px;
-  padding: 20px;
+  height: 100%;
+  margin: 0;
 }
 
 body {
+  overflow: hidden;
+}
+
+#content {
   background-color: white;
+  display: flex;
+  width: 100%;
+  top: 0;
+  left: 0;
+  flex-direction: column;
+}
+
+#topnav {
+  overflow: visible;
+  background-color: black;
+  color: #FFD300;
+  flex: 0 0 auto;
+}
+
+#topbody {
+  background-color: white;
+  flex: 1 1 auto;
+  position: relative;
+  overflow-y: auto;
+  margin: 8px;
 }
 
 #logo {
  margin: 10px;
  float: left;
- width: 45px;
- height: 72px;
- background: url(../img/coyote-small.png) no-repeat center;
+ width: 74px;
+ height: 120px;
+ background: url(../img/coyote-medium.png) no-repeat center;
  display: block;
 }
