@@ -1,3 +1,5 @@
+var season = '2016-2017';
+
 function showMenuDiv(menuID) {
   var x = document.getElementsByClassName('menuDiv');
   for (i = 0; i < x.length; i++) {
@@ -28,4 +30,10 @@ function onload() {
     menuParam = 'home';
   }
   showMenuDiv(menuParam);
+}
+
+function jumpto(page) {
+  var path = window.location.pathname;
+  var url = path + '?page=' + page;
+  document.location.href = url;
 }
