@@ -1,19 +1,10 @@
 /* Title font */
-/*
-  font-family: 'Bungee Inline', cursive;
-*/
-
 h1 {
   text-align: center;
   font-family: 'Holtwood One SC', serif;
-  font-size: 280%;
-  background-color: black;
-  color: #FFD300;
-}
-
-h2 {
-  text-align: center;
-  font-size: 150%;
+  font-size: 4vw;
+  font-weight: lighter;
+  font-variant: small-caps
   background-color: black;
   color: #FFD300;
 }
@@ -59,6 +50,7 @@ body {
   background-color: black;
   color: #FFD300;
   flex: 0 0 auto;
+  z-index: 100;
 }
 
 #topbody {
@@ -70,17 +62,25 @@ body {
 }
 
 #logo {
-  margin: 10px;
+  margin: 6px;
   float: left;
   width: 74px;
   height: 120px;
   background: url(../img/coyote-medium.png) no-repeat center;
-  display: block;
+}
+
+@media screen and (max-width: 710px) {
+  #logo {
+    margin: 3px;
+    width: 45px;
+    height: 72px;
+    background: url(../img/coyote-small.png) no-repeat center;
+  }
 }
 
 #homeimg {
-   min-height: 100%;
    width: 100%;
+   height: auto;
    top: 0;
    padding: 0;
    left: 0;
