@@ -13,12 +13,12 @@ td {
 
 tr:nth-child(even){
   background-color: gray;
-  color: #FFD300; 
+  color: goldenrod;
 }
 
 tr:hover {
   background-color: black;
-  color: #FFD300; 
+  color: goldenrod;
 }
 
 th.roster {
@@ -27,7 +27,7 @@ th.roster {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: left;
-  background-color: gold;
+  background-color: goldenrod;
   color: black;
 }
 
@@ -37,6 +37,6 @@ th.schedule {
   padding-top: 4px;
   padding-bottom: 4px;
   text-align: left;
-  background-color: gold;
+  background-color: goldenrod;
   color: black;
 }

@@ -12,17 +12,17 @@
 .rmm-toggled {width: 100%; background-color: black; min-height: 50px; margin: 0 auto; display: none;}
 .rmm-closed ~ .rmm-mobile {display: none!important;}
 .rmm-toggled-controls{width: 100%;}
-.rmm-toggled-title{width: 20%; float: left; color: gold; display: block; padding: 8px 0; text-decoration: none; text-align: right; padding-left: 35px;}
+.rmm-toggled-title{width: 20%; float: left; color: goldenrod; display: block; padding: 8px 0; text-decoration: none; text-align: right; padding-left: 35px;}
 .rmm-toggled-button{width: 20%; float: left; margin-top: 3px;
 	display:block;
 	width: 32px;
 	padding:0 !important;
 	margin:10px 10px 0 0;
-	border:1px solid gold;
+	border:1px solid goldenrod;
 	border-radius:3px;
 	float: right;
 }
-.rmm-toggled-button span{float: left; display:block; margin: 3px 6px; height: 3px; background:gold; width:20px;}
+.rmm-toggled-button span{float: left; display:block; margin: 3px 6px; height: 3px; background:goldenrod; width:20px;}
 
 /* back button visible only on mobiles  */
 .rmm .rmm-back {display: none; }
@@ -30,7 +30,7 @@
 .rmm .rmm-back a:before {
                         border-bottom: 5px solid transparent;
                         border-top: 5px solid transparent;
-                        border-right: 5px solid gold;
+                        border-right: 5px solid goldenrod;
                         border-left: 5px solid transparent;
                         border-radius: 1px;
                         content: "";
@@ -68,18 +68,18 @@
 .rmm.style {text-align: left; font: bold 10px/10px sans-serif;}
 .rmm.style ul {box-shadow: 0px 0px 9px; color:black; background: black; display: inline-table; text-align:left;}
 .rmm.style ul li {text-align:left;}
-.rmm.style ul li:hover {background: gold; color: black;}
-.rmm.style ul li a:hover {color: black; background: gold;}
+.rmm.style ul li:hover {background: goldenrod; color: black;}
+.rmm.style ul li a:hover {color: black; background: goldenrod;}
 .rmm.style ul ul {display: none; margin:0; background: black; border-radius: 0px; padding: 0; position: absolute;}
-.rmm.style ul li a {background: black; color: gold; display: block; padding: 15px 15px; text-decoration: none; }
+.rmm.style ul li a {background: black; color: goldenrod; display: block; padding: 15px 15px; text-decoration: none; }
 .rmm.style ul ul li {border-bottom: 1px solid black; border-top: 1px solid black;}
-.rmm.style ul ul li a {padding: 12px 35px; color: gold; }
-.rmm.style ul ul li a:hover {background: gold; color: black;}
+.rmm.style ul ul li a {padding: 12px 35px; color: goldenrod; }
+.rmm.style ul ul li a:hover {background: goldenrod; color: black;}
 
 /* arrow down for wide screen */
 .rmm.style ul li > a:not(:only-child):after {
                         border-bottom: 5px solid transparent;
-                        border-top: 5px solid gold;
+                        border-top: 5px solid goldenrod;
                         border-right: 5px solid transparent;
                         border-left: 5px solid transparent;
                         border-radius: 1px;
@@ -99,7 +99,7 @@
 .rmm.style ul ul li > a:not(:only-child):after {
                         border-bottom: 5px solid transparent;
                         border-top: 5px solid transparent;
-                        border-right: 5px solid gold;
+                        border-right: 5px solid goldenrod;
                         border-left: 5px solid transparent;
                         border-radius: 1px;
                         content: "";
@@ -114,7 +114,7 @@
 /* mobile style */
 .rmm.style .rmm-mobile li > a:not(:only-child):after {
                         border-bottom: 5px solid transparent;
-                        border-top: 5px solid gold;
+                        border-top: 5px solid goldenrod;
                         border-right: 5px solid transparent;
                         border-left: 5px solid transparent;
                         border-radius: 1px;

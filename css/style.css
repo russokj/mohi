@@ -6,7 +6,7 @@ h1 {
   font-weight: lighter;
   font-variant: small-caps
   background-color: black;
-  color: #FFD300;
+  color: goldenrod;
 }
 
 div.normalDiv {
@@ -48,7 +48,7 @@ body {
 #topnav {
   overflow: visible;
   background-color: black;
-  color: #FFD300;
+  color: goldenrod;
   flex: 0 0 auto;
   z-index: 100;
 }

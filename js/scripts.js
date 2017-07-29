@@ -37,3 +37,7 @@ function jumpto(page) {
   var url = path + '?page=' + page;
   document.location.href = url;
 }
+
+function nop() {
+  return true;
+}
