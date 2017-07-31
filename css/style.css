@@ -4,9 +4,10 @@ h1 {
   font-family: 'Holtwood One SC', serif;
   font-size: 4vw;
   font-weight: lighter;
+  letter-spacing: 4px;
   font-variant: small-caps
-  background-color: black;
   color: goldenrod;
+  text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }
 
 div.normalDiv {
@@ -26,7 +27,7 @@ img.campSlidex {
   display:none;
 }
 
-html, body, #content {
+html, body, #body {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -36,7 +37,7 @@ body {
   overflow: hidden;
 }
 
-#content {
+#body {
   background-color: white;
   display: flex;
   width: 100%;
@@ -45,15 +46,16 @@ body {
   flex-direction: column;
 }
 
-#topnav {
+#header {
   overflow: visible;
   background-color: black;
   color: goldenrod;
   flex: 0 0 auto;
+  flex-direction: row;
   z-index: 100;
 }
 
-#topbody {
+#content {
   background-color: white;
   flex: 1 1 auto;
   position: relative;
@@ -66,8 +68,14 @@ body {
   float: left;
   width: 74px;
   height: 120px;
+  flex: auto;
   background: url(../img/coyote-medium.png) no-repeat center;
 }
+
+#menu {
+  flex: auto;
+}
+
 
 @media screen and (max-width: 710px) {
   #logo {
