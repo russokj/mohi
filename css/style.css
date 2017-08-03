@@ -6,8 +6,9 @@ h1 {
   font-weight: lighter;
   letter-spacing: 4px;
   font-variant: small-caps
-  color: goldenrod;
+  color: black;
   text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  line-height: 90%
 }
 
 div.normalDiv {
@@ -48,8 +49,8 @@ body {
 
 #header {
   overflow: visible;
-  background-color: black;
-  color: goldenrod;
+  background-color: goldenrod;
+  color: black;
   flex: 0 0 auto;
   flex-direction: row;
   z-index: 100;
@@ -70,6 +71,18 @@ body {
   height: 120px;
   flex: auto;
   background: url(../img/coyote-medium.png) no-repeat center;
+}
+
+#year {
+  float: right;
+  flex: auto;
+}
+
+select.year {
+  background-color: goldenrod;
+  color: black;
+  border: none;
+  outline: none;
 }
 
 #menu {
