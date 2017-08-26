@@ -38,6 +38,7 @@ body {
 }
 
 #body {
+  /* If no flex, title stays the same size */
   background-color: white;
   display: flex;
   width: 100%;
@@ -50,31 +51,33 @@ body {
   overflow: visible;
   background-color: black;
   color: goldenrod;
+  display: flex;
   flex: 0 0 auto;
   flex-direction: row;
-  z-index: 100;
 }
 
 #content {
   background-color: white;
-  flex: 1 1 auto;
   position: relative;
   overflow-y: auto;
   margin: 8px;
 }
 
 #logo {
+  background-color: red;
   margin: 6px;
-  float: left;
   width: 74px;
   height: 120px;
-  flex: auto;
-  background: url(../img/coyote-medium.png) no-repeat center;
+  flex: initial;
+  background: url(../img/coyote-medium.png) no-repeat top;
 }
 
-#year {
-  float: right;
-  flex: auto;
+#header-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  background-color: black;
 }
 
 select.year {
@@ -84,13 +87,27 @@ select.year {
   outline: none;
 }
 
-#menu {
-  flex: auto;
-}
-
 #title {
   padding: 0px;
   margin: 0px;
+  background-color: black;
+  flex: 1;
+}
+
+#header-right {
+  display: flex;
+  flex-direction: row;
+  background-color: black;
+}
+
+#menu {
+  background-color: black;
+  flex: 1;
+  z-index: 100;
+}
+
+#year {
+  flex: initial;
 }
 
 @media screen and (max-width: 710px) {
