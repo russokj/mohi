@@ -85,6 +85,7 @@ select.year {
   color: goldenrod;
   border: none;
   outline: none;
+  margin: 5px;
 }
 
 #title {
@@ -116,6 +117,12 @@ select.year {
     width: 45px;
     height: 72px;
     background: url(../img/coyote-small.png) no-repeat center;
+  }
+  #header-right {
+    flex-direction: row-reverse;
+  }
+  #header-main {
+    flex-direction: column;
   }
   h1 {
     line-height: 120%
