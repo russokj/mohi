@@ -83,6 +83,7 @@ body {
 select.year {
   background-color: black;
   color: goldenrod;
+  background: transparent;
   border: none;
   outline: none;
   margin: 5px;
