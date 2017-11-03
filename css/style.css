@@ -22,11 +22,6 @@ p {
   margin-bottom: 1em;
 }
 
-/* Slide Shows */
-img.campSlidex {
-  display:none;
-}
-
 html, body, #body {
   width: 100%;
   height: 100%;
