@@ -1,4 +1,5 @@
 /* Roster and Schedules  */
+/* TODO: make table elements specific to a class type and not general to all tables */
 
 .roster  .schedule{
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -7,12 +8,12 @@
 }
 
 td {
-  border: 0px solid #ddd;
+  border: 0px solid black;
   padding: 8px;
 }
 
 tr:nth-child(even){
-  background-color: gray;
+  background-color: silver;
   color: black;
 }
 
@@ -22,7 +23,7 @@ tr:hover {
 }
 
 th.roster {
-  border: 0px solid #ddd;
+  border: 0px solid black;
   padding: 8px;
   padding-top: 12px;
   padding-bottom: 12px;
@@ -32,7 +33,7 @@ th.roster {
 }
 
 th.schedule {
-  border: 0px solid #ddd;
+  border: 0px solid black;
   padding: 2px;
   padding-top: 4px;
   padding-bottom: 4px;

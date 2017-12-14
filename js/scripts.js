@@ -1,15 +1,17 @@
-var season = '2016-2017';
+currentMenuID = "home";
 
 
 function showMenuDiv(menuID) {
+  currentMenuID = menuID;
   switch (menuID) {
     case "home": displayHome(); break;
-    case "practices": displayPractices(); break;
-    case "games": displayGames(); break;
-    case "events": displayEvents(); break;
-    case "varsityteam": displayVarsityTeam(); break;
-    case "jvteam": displayJvTeam(); break;
-    case "cteam": displayCTeam(); break;
+    case "calendar": displayCalendar(); break;
+    case "varsityroster": displayVarsityRoster(); break;
+    case "jvroster": displayJvRoster(); break;
+    case "croster": displayCRoster(); break;
+    case "varsityschedule": displayVarsitySchedule(); break;
+    case "jvschedule": displayJvSchedule(); break;
+    case "cschedule": displayCSchedule(); break;
     case "articles": displayArticles(); break;
     case "photos": displayPhotos(); break;
     case "coaches": displayCoaches(); break;
@@ -37,6 +39,10 @@ function onload() {
   if (!menuParam) {
     menuParam = 'home';
   }
+
+  let year = getYear();
+  setYear(year);
+
   showMenuDiv(menuParam);
 }
 
@@ -45,6 +51,33 @@ function jumpto(page) {
   var url = path + '?page=' + page;
   document.location.href = url;
 }
+
+
+// Called when user selects a new year
+function yearChanged(year) {
+  setYear(year);
+  showMenuDiv(currentMenuID);
+}
+
+
+function setYear(year) {
+  element = document.getElementById("selectYear");
+  changed = element.value != year;
+  element.value = year;
+  localStorage.setItem("season", year);
+  return changed;
+}
+
+
+function getYear() {
+  let year = localStorage.getItem("season");
+  if (!year || year === '') {
+    year = document.getElementById("selectYear").value;
+    localStorage.setItem("season", year);
+  }
+  return year;
+}
+
 
 function nop() {
   return true;
@@ -57,100 +90,89 @@ function displayTBD() {
 
 
 function displayHome() {
-  document.getElementById("menucontent").innerHTML = 
+  document.getElementById("menucontent").innerHTML =
     '<img id="homeimg" src="img/home.jpg" border="0" alt="Monarch Proud">';
 }
 
 
-let photoIdx = -1;
-let startTimer = true;
+localStorage.setItem("photoIdx", 0);
+
+const maxPhoto = {
+ "2016-2017": 40,
+ "2017-2018": 4,
+};
+
+
+let timeoutId = null;
 
 function displayPhotos() {
-  photoIdx = photoIdx + 1;
-  photoIdx = photoIdx % 40;
-  let photoPath = "img/games-2016/" + photoIdx.toString() + ".jpg"; 
-  let innerHtml = '<img class="campSlide" src="' + photoPath + '", style="width:100%">';
-  document.getElementById("menucontent").innerHTML = innerHtml;
-  if (startTimer) {
-    setTimeout(displayPhotos, 3000);
+  if (timeoutId) {
+    clearTimeout(timeoutId);
   }
+
+  let year = getYear();
+  let photoIdx = parseInt(localStorage.getItem("photoIdx"));
+  photoIdx = photoIdx + 1;
+  photoIdx = photoIdx % maxPhoto[year];
+  localStorage.setItem("photoIdx", photoIdx);
+
+  let photoPath = "img/" + year + "/" + photoIdx.toString() + ".jpg";
+  let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">';
+  document.getElementById("menucontent").innerHTML = innerHtml;
+  timeoutId = setTimeout(displayPhotos, 5500);
 }
 
 
-function displayPractices() {
-  document.getElementById("menucontent").innerHTML = `
-    <table> 
-      <tr>
-         <th>Event</th>
-         <th>Date</th>
-         <th>Time</th>
-      </tr>
-      <tr>
-         <td>Open Gym</td>
-         <td>Sat Nov 4th</td>
-         <td>8:00-10:00 AM</td>
-      </tr>
-      <tr>
-         <td>Open Gym</td>
-         <td>Tue Nov 7th</td>
-         <td>3:30-5:30 PM</td>
-      </tr>
-      <tr>
-         <td>Open Gym</td>
-         <td>Thu Nov 9th</td>
-         <td>3:30-5:30 PM</td>
-      </tr>
-    <table>
-  `;
+function displayCalendar() {
+  document.getElementById("menucontent").innerHTML = 'Coming soon!';
 }
 
 
-function displayGames() {
-  document.getElementById("menucontent").innerHTML = 'This page is under construction';
+function displayVarsityRoster() {
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' Varsity Team Roster</center><div id="rosterId" class="roster">retrieving ...</div>';
+  loadRoster('VARSITY', getYear());
 }
 
 
-function displayEvents() {
-  document.getElementById("menucontent").innerHTML = `
-    Tryouts will be held at the Monarch High School gym on the following days:
-    <table> 
-      <tr>
-         <td>Fri Nov 10th</td>
-         <td>10:00 AM - 12:00 PM</td>
-      </tr>
-      <tr>
-         <td>Sat Nov 11th</td>
-         <td>8:00 AM - 10:00 AM</td>
-      </tr>
-    </table> 
-    <br>
-    If you plan to try out, you must complete the following two steps before tryouts begin:
-    <ol>
-      <li>Register with <a href="http://moh.bvsd.org/AandA/athletics/Pages/Registration-Fees.aspx" target="_blank">BVSD Athletics</a></li>
-      <li>Bring a copy of your current physical to the Athletics office.</li>
-    </ol>
-  `;
+function displayJvRoster() {
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' JV Team Roster</center><div id="rosterId" class="roster">retrieving ...</div>';
+  loadRoster('JV', getYear());
 }
 
 
-function displayVarsityTeam() {
-  document.getElementById("menucontent").innerHTML = 'This page is under construction';
+function displayCRoster() {
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' C Team Roster</center><div id="rosterId" class="roster">retrieving ...</div>';
+  loadRoster('C', getYear());
 }
 
 
-function displayJvTeam() {
-  document.getElementById("menucontent").innerHTML = 'This page is under construction';
+function displayVarsitySchedule() {
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' Varsity Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
+  loadSchedule('VARSITY', getYear());
 }
 
 
-function displayCTeam() {
-  document.getElementById("menucontent").innerHTML = 'This page is under construction';
+function displayJvSchedule() {
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' JV Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
+  loadSchedule('JV', getYear());
+}
+
+
+function displayCSchedule() {
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' C Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
+  loadSchedule('C', getYear());
 }
 
 
 function displayArticles() {
   document.getElementById("menucontent").innerHTML = `
-    <table> 
+    <table>
       <tr>
          <th>Date</th>
          <th>Link</th>
@@ -172,15 +194,15 @@ function displayArticles() {
 
 
 function displayCoaches() {
-  document.getElementById("menucontent").innerHTML = 'This page is under construction';
+  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
 }
 
 
 function displayAdministration() {
-  document.getElementById("menucontent").innerHTML = 'This page is under construction';
+  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
 }
 
 
 function displayWebsite() {
-  document.getElementById("menucontent").innerHTML = 'This page is under construction';
+  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
 }

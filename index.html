@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 
     <meta name="keywords" content="monarch girls basketball camp mohi coyotes louisville colorado"/>
-    <meta name="google-site-verification" content="1aJlP92tKGKOX9S2gq9YOp0M6cZnBJPHn3bbkSRQ5a4"/>
     <link rel="shortcut icon" type="image/png" href="img/coyote.png" />
     <link rel="stylesheet" type="text/css" href="css/style.css" />
     <link rel="stylesheet" type="text/css" href="css/table.css" />
@@ -21,6 +20,19 @@
 
     <link href="https://fonts.googleapis.com/css?family=Holtwood+One+SC" rel="stylesheet">
     <script type="text/javascript" src="js/table.js"></script>
+
+    <!-- Google Docs -->
+    <meta name="google-site-verification" content="1aJlP92tKGKOX9S2gq9YOp0M6cZnBJPHn3bbkSRQ5a4"/>
+    <script src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+    <!--
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+    -->
   </head>
 
   <body onload="javascript:onload();">
@@ -35,18 +47,24 @@
             <nav id="menu" class="rmm style">
               <ul>
                 <li><a href="javascript:jumpto('home');">Home</a></li>
-                <li><a href="#" onclick="return false">Schedule & Events</a>
+                <li><a href="#" onclick="return false">Team</a>
                   <ul>
-                    <li><a href="javascript:jumpto('practices');">Practices</a></li>
-                    <li><a href="javascript:jumpto('games');">Games</a></li>
-                    <li><a href="javascript:jumpto('events');">Team Events</a></li>
+                    <li><a href="javascript:jumpto('calendar');">Calendar</a></li>
+                    <li><a href="http://www.teampages.com/teams/821843-Monarch-Girls-Basketball-basketball-team-website" target="_blank">Team Page</a></li>
                   </ul>
                 </li>
-                <li><a href="#" onclick="return false">Rosters</a>
+                <li><a href="#" onclick="return false">Schedule</a>
                   <ul>
-                    <li><a href="javascript:jumpto('varsityteam');">Varsity</a></li>
-                    <li><a href="javascript:jumpto('jvteam');">JV</a></li>
-                    <li><a href="javascript:jumpto('cteam');">C-Team</a></li>
+                    <li><a href="javascript:jumpto('varsityschedule');">Varsity</a></li>
+                    <li><a href="javascript:jumpto('jvschedule');">JV</a></li>
+                    <li><a href="javascript:jumpto('cschedule');">C-Team</a></li>
+                  </ul>
+                </li>
+                <li><a href="#" onclick="return false">Roster</a>
+                  <ul>
+                    <li><a href="javascript:jumpto('varsityroster');">Varsity</a></li>
+                    <li><a href="javascript:jumpto('jvroster');">JV</a></li>
+                    <li><a href="javascript:jumpto('croster');">C-Team</a></li>
                   </ul>
                 </li>
                 <li><a href="#" onclick="return false">News & Info</a>
@@ -73,9 +91,9 @@
               </ul>
             </nav>
             <div id="year">
-              <select class="year">
-                <option value="2017">2017-2018</option>
-                <option value="2016">2016-2017</option>
+              <select class="year" id="selectYear" onchange="yearChanged(this.value);">
+                <option value="2016-2017">2016-2017</option>
+                <option value="2017-2018">2017-2018</option>
               </select>
             </div>
           </div>

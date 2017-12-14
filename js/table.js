@@ -1,10 +1,14 @@
 // Array of API discovery doc URLs for APIs used by the quickstart
-var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
-var MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
+let DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+let MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+let SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+
+let gapi_init = false;
+let delayedTableCall = null;
+
 
 /**
  *  On load, called to load the auth2 library and API client library.
@@ -18,52 +22,90 @@ function handleClientLoad() {
  *  listeners.
  */
 function initClient() {
+  // TODO: only do first time
   gapi.client.init({
     discoveryDocs: DISCOVERY_DOCS,
     apiKey: MOHI_APIKEY,
     scope: SCOPES
   }).then(function () {
-    // For now, just print a roster - later on we will select 
-    listSchedule('A', '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI');
+    gapi_init = true;
+    if (delayedTableCall) {
+      delayedTableCall();
+      delayedTableCall = null;
+    }
   }, function(reason) {
     alert('Error: ' + reason.result.error.message);
   });
 }
 
-function generateTable(dataArray, tableClass, id) {
+// Need to pull these from master selector spreadsheet and base it off of year
+let rosterSpreadSheetID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI';
+let scheduleSpreadSheetID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI';
+
+function loadSchedule(team, year) {
+  if (!gapi_init) {
+    delayedTableCall = listSchedule.bind(null, team, year, scheduleSpreadSheetID);
+  } else {
+    listSchedule(team, year, scheduleSpreadSheetID);
+  }
+}
+
+function loadRoster(team, year) {
+  if (!gapi_init) {
+    delayedTableCall = listRoster.bind(null, team, year, rosterSpreadSheetID);
+  } else {
+    listRoster(team, year, rosterSpreadSheetID);
+  }
+}
+
+function listRoster(team, year, spreadSheetId) {
+  let page = year + '_' + team + '_ROSTER';
+  listTable(page, spreadSheetId, 'roster', 'rosterId', 'A1:E')
+}
+
+function listSchedule(team, year, spreadSheetId) {
+  let page = year + '_' + team + '_SCHEDULE';
+  listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:F')
+}
+
+function generateTable(dataArray, tableClass, tableId) {
   // pass in two dimensional array for rows/columns
   // TODO: pass in title, table name
 
-  //Create a HTML Table element.
-  var table = document.createElement('TABLE');
+  // Create a HTML Table element.
+  let table = document.createElement('TABLE');
   // TODO: Should tie name to class 
   table.setAttribute('class', tableClass);
 
   //Get the count of columns.
-  var columnCount = dataArray[0].length;
+  let columnCount = dataArray[0].length;
 
   //Add the header row.
-  var row = table.insertRow(-1);
-  row.setAttribute('class', 'roster');
-  for (var i = 0; i < columnCount; i++) {
-      var headerCell = document.createElement("TH");
-      headerCell.setAttribute('class', 'roster');
+  let row = table.insertRow(-1);
+  row.setAttribute('class', tableClass);
+  for (let i = 0; i < columnCount; i++) {
+      let headerCell = document.createElement("TH");
+      headerCell.setAttribute('class', tableClass);
       headerCell.innerHTML = dataArray[0][i];
       row.appendChild(headerCell);
   }
 
   //Add the data rows.
-  for (var i = 1; i < dataArray.length; i++) {
+  for (let i = 1; i < dataArray.length; i++) {
     row = table.insertRow(-1);
-    row.setAttribute('class', 'roster');
-    for (var j = 0; j < columnCount; j++) {
-      var cell = row.insertCell(-1);
-      cell.setAttribute('class', 'roster');
-      cell.innerHTML = dataArray[i][j];
+    row.setAttribute('class', tableClass);
+    for (let j = 0; j < columnCount; j++) {
+      let cell = row.insertCell(-1);
+      cell.setAttribute('class', tableClass);
+      let data = dataArray[i][j];
+      if (data === undefined) {
+         data = '';
+      }
+      cell.innerHTML = data;
     }
   }
 
-  var dvTable = document.getElementById(id);
+  let dvTable = document.getElementById(tableId);
   dvTable.innerHTML = "";
   dvTable.appendChild(table);
 }
@@ -75,48 +117,34 @@ function generateTable(dataArray, tableClass, id) {
  * @param {string} message Text to be placed in pre element.
  */
 function appendPre(message) {
-  var pre = document.getElementById('content');
-  var textContent = document.createTextNode(message + '\n');
+  let pre = document.getElementById('content');
+  let textContent = document.createTextNode(message + '\n');
   pre.appendChild(textContent);
 }
 
-/**
- * Print the names and majors of students in a sample spreadsheet:
- * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit/#gid=58192009
- */
-// TODO: Might want to make this more generic
-//       Add table name, and range, spreadsheetId, key)
-function listRoster(team, spreadSheetId) {
-  listTable(String(team) + '-ROSTER', spreadSheetId, 'roster', 'A1:D')
-}
-
-function listSchedule(team, spreadSheetId) {
-  listTable(String(team) + '-SCHEDULE', spreadSheetId, 'schedule', 'A1:F')
-}
-
-function listTable(pagename, spreadSheetId, tableClass, range) {
-  rosterRange = pagename + '!' + range;
+function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
+  let pageRange = String(pagename) + "!" + range;
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
     key: MOHI_APIKEY,
-    range: rosterRange
+    range: pageRange
   }).then(function(response) {
-    var range = response.result;
+    let range = response.result;
     if (range.values.length > 0) {
-      var dataArray = new Array();
+      let dataArray = new Array();
       for (row = 0; row < range.values.length; row++) {
-        var entry = range.values[row];
-        var dataRow = new Array();
+        let entry = range.values[row];
+        let dataRow = new Array();
         for (col = 0; col < entry.length; col++) {
-          dataRow.push(entry[col])
+          dataRow.push(entry[col]);
         }
         dataArray.push(dataRow);
       }
-      generateTable(dataArray, tableClass, 'tableId');
+      generateTable(dataArray, tableClass, tableId);
     } else {
-      appendPre('No roster is available');
+      appendPre('Could not retrieve data');
     }
   }, function(response) {
-    appendPre('Error: ' + response.result.error.message);
+    document.getElementById("menucontent").innerHTML = 'No information found';
   });
 }
