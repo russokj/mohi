@@ -39,22 +39,25 @@ function initClient() {
 }
 
 // Need to pull these from master selector spreadsheet and base it off of year
-let rosterSpreadSheetID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI';
-let scheduleSpreadSheetID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI';
+let spreadSheetIDs = {
+'2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
+'2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
+};
 
 function loadSchedule(team, year) {
   if (!gapi_init) {
-    delayedTableCall = listSchedule.bind(null, team, year, scheduleSpreadSheetID);
+    delayedTableCall = listSchedule.bind(null, team, year, spreadSheetIDs[year]);
   } else {
-    listSchedule(team, year, scheduleSpreadSheetID);
+    listSchedule(team, year, spreadSheetIDs[year]);
   }
 }
 
 function loadRoster(team, year) {
+
   if (!gapi_init) {
-    delayedTableCall = listRoster.bind(null, team, year, rosterSpreadSheetID);
+    delayedTableCall = listRoster.bind(null, team, year, spreadSheetIDs[year]);
   } else {
-    listRoster(team, year, rosterSpreadSheetID);
+    listRoster(team, year, spreadSheetIDs[year]);
   }
 }
 
