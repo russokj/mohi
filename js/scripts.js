@@ -90,8 +90,10 @@ function displayTBD() {
 
 
 function displayHome() {
+  let year = getYear();
+  let photoPath = "img/" + year + "/" + "home.jpg";
   document.getElementById("menucontent").innerHTML =
-    '<img id="homeimg" src="img/home.jpg" border="0" alt="Monarch Proud">';
+    '<img id="homeimg" src="' + photoPath + '" border="0" alt="Monarch Proud">';
 }
 
 
