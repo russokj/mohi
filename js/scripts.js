@@ -124,7 +124,8 @@ function displayPhotos() {
 
 
 function displayCalendar() {
-  document.getElementById("menucontent").innerHTML = 'Coming soon!';
+  // TODO: must autogenerate the calendar_redirect.html so we can add a start date
+  document.getElementById("menucontent").innerHTML = '<iframe src="calendar_redirect.html" type="application/pdf" style="border:none;" height="600" width="100%"/>';
 }
 
 
