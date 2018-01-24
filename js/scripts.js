@@ -97,9 +97,10 @@ function displayHome() {
 
 localStorage.setItem("photoIdx", 0);
 
+// TODO: Must retrieve these from spreadsheet (as well as images, and not depend on naming convention!)
 const maxPhoto = {
  "2016-2017": 40,
- "2017-2018": 4,
+ "2017-2018": 31,
 };
 
 
