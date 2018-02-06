@@ -175,25 +175,9 @@ function displayCSchedule() {
 
 
 function displayArticles() {
-  document.getElementById("menucontent").innerHTML = `
-    <table>
-      <tr>
-         <th>Date</th>
-         <th>Link</th>
-      </tr>
-      <tr>
-        <td>Oct 28, 2017</td>
-        <td><a href="http://www.9news.com/sports/college/carter-quickly-changes-the-plan-in-boulder/486460730", target="_blank">Carter changes plan at CU Boulder</a></td>
-      <tr>
-         <td>Feb 26, 2017</td>
-         <td><a href="http://www.9news.com/sports/high-school/monarchs-super-seven-make-improbable-basketball-run/414843895", target="_blank">Super 7 make improbable run</a></td>
-      </tr>
-      <tr>
-         <td>Jan 15, 2017</td>
-         <td><a href="http://www.rockiesbasketball.com/news_article/show/752585?referrer_id=2145892", target="_blank">Carter develops into an elite point guard</a></td>
-      </tr>
-    <table>
-  `;
+  document.getElementById("menucontent").innerHTML =
+    '<center>Monarch Girls in the News</center>' + '<div id="articleId" class="article">retrieving ...</div>';
+  loadArticles();
 }
 
 
@@ -208,5 +192,6 @@ function displayAdministration() {
 
 
 function displayWebsite() {
-  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
+  document.getElementById("menucontent").innerHTML = '';
+  loadWebsiteContact();
 }
