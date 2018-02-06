@@ -1,20 +1,20 @@
 // Array of API discovery doc URLs for APIs used by the quickstart
-let DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"];
+let DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
 let MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-let SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+let SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly"
 
-let gapi_init = false;
-let delayedSpreadsheetAPICall = null;
+let gapi_init = false
+let delayedSpreadsheetAPICall = null
 
 
 /**
  *  On load, called to load the auth2 library and API client library.
  */
 function handleClientLoad() {
-  gapi.load('client', initClient);
+  gapi.load('client', initClient)
 }
 
 /**
@@ -28,40 +28,40 @@ function initClient() {
     apiKey: MOHI_APIKEY,
     scope: SCOPES
   }).then(function () {
-    gapi_init = true;
+    gapi_init = true
     if (delayedSpreadsheetAPICall) {
-      delayedSpreadsheetAPICall();
-      delayedSpreadsheetAPICall = null;
+      delayedSpreadsheetAPICall()
+      delayedSpreadsheetAPICall = null
     }
   }, function(reason) {
-    alert('Error: ' + reason.result.error.message);
-  });
+    alert('Error: ' + reason.result.error.message)
+  })
 }
 
 // Need to pull these from master selector spreadsheet and base it off of year
 let spreadSheetIDs = {
 '2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
 '2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
-};
+}
 
-let websiteContactSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g';
-let articlesSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g';
-let adminSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g';
+let websiteContactSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
+let articlesSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
+let adminSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
 
 
 function loadSchedule(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listSchedule.bind(null, team, year, spreadSheetIDs[year]);
+    delayedSpreadsheetAPICall = listSchedule.bind(null, team, year, spreadSheetIDs[year])
   } else {
-    listSchedule(team, year, spreadSheetIDs[year]);
+    listSchedule(team, year, spreadSheetIDs[year])
   }
 }
 
 function loadRoster(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listRoster.bind(null, team, year, spreadSheetIDs[year]);
+    delayedSpreadsheetAPICall = listRoster.bind(null, team, year, spreadSheetIDs[year])
   } else {
-    listRoster(team, year, spreadSheetIDs[year]);
+    listRoster(team, year, spreadSheetIDs[year])
   }
 }
 
@@ -83,54 +83,54 @@ function loadArticles() {
 
 function loadWebsiteContact() {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listWebsiteContact.bind(null, websiteContactSpreadSheetID);
+    delayedSpreadsheetAPICall = listWebsiteContact.bind(null, websiteContactSpreadSheetID)
   } else {
-    listWebsiteContact(websiteContactSpreadSheetID);
+    listWebsiteContact(websiteContactSpreadSheetID)
   }
 }
 
 function listRoster(team, year, spreadSheetId) {
-  let page = year + '_' + team + '_ROSTER';
+  let page = year + '_' + team + '_ROSTER'
   listTable(page, spreadSheetId, 'roster', 'rosterId', 'A1:E')
 }
 
 function listSchedule(team, year, spreadSheetId) {
-  let page = year + '_' + team + '_SCHEDULE';
+  let page = year + '_' + team + '_SCHEDULE'
   listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:F')
 }
 
 function listAdmin(spreadSheetId) {
-  let page = 'Contacts-Admin';
+  let page = 'Contacts-Admin'
   listTable(page, spreadSheetId, 'admin', 'adminId', 'A3:D')
 }
 
 function listArticles(spreadSheetId) {
-  let page = 'Articles';
+  let page = 'Articles'
   listLinkTable(page, spreadSheetId, 'article', 'articleId', 'A3:D', 2, 4)
 }
 
 function listWebsiteContact(spreadSheetId) {
-  let range = 'A3';
-  let pageName = 'Contacts-Other';
-  let pageRange = String(pageName) + "!" + range;
+  let range = 'A3'
+  let pageName = 'Contacts-Other'
+  let pageRange = String(pageName) + "!" + range
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
-    let range = response.result;
+    let range = response.result
     if (range.values.length > 0) {
-      let entry = range.values[0];
+      let entry = range.values[0]
       if (entry.length > 0) {
-        let content = entry[0];
-        document.getElementById("menucontent").innerHTML = content;
-        return;
+        let content = entry[0]
+        document.getElementById("menucontent").innerHTML = content
+        return
       }
     }
-    appendPre('Could not retrieve data');
+    appendPre('Could not retrieve data')
   }, function(response) {
-    document.getElementById("menucontent").innerHTML = 'No information found';
-  });
+    document.getElementById("menucontent").innerHTML = 'No information found'
+  })
 }
 
 function generateTable(dataArray, tableClass, tableId) {
@@ -138,41 +138,41 @@ function generateTable(dataArray, tableClass, tableId) {
   // TODO: pass in title, table name
 
   // Create a HTML Table element.
-  let table = document.createElement('TABLE');
+  let table = document.createElement('TABLE')
   // TODO: Should tie name to class 
-  table.setAttribute('class', tableClass);
+  table.setAttribute('class', tableClass)
 
   //Get the count of columns.
-  let columnCount = dataArray[0].length;
+  let columnCount = dataArray[0].length
 
   //Add the header row.
-  let row = table.insertRow(-1);
-  row.setAttribute('class', tableClass);
+  let row = table.insertRow(-1)
+  row.setAttribute('class', tableClass)
   for (let i = 0; i < columnCount; i++) {
-      let headerCell = document.createElement("TH");
-      headerCell.setAttribute('class', tableClass);
-      headerCell.innerHTML = dataArray[0][i];
-      row.appendChild(headerCell);
+      let headerCell = document.createElement("TH")
+      headerCell.setAttribute('class', tableClass)
+      headerCell.innerHTML = dataArray[0][i]
+      row.appendChild(headerCell)
   }
 
   //Add the data rows.
   for (let i = 1; i < dataArray.length; i++) {
-    row = table.insertRow(-1);
-    row.setAttribute('class', tableClass);
+    row = table.insertRow(-1)
+    row.setAttribute('class', tableClass)
     for (let j = 0; j < columnCount; j++) {
-      let cell = row.insertCell(-1);
-      cell.setAttribute('class', tableClass);
-      let data = dataArray[i][j];
+      let cell = row.insertCell(-1)
+      cell.setAttribute('class', tableClass)
+      let data = dataArray[i][j]
       if (data === undefined) {
-         data = '';
+         data = ''
       }
-      cell.innerHTML = data;
+      cell.innerHTML = data
     }
   }
 
-  let dvTable = document.getElementById(tableId);
-  dvTable.innerHTML = "";
-  dvTable.appendChild(table);
+  let dvTable = document.getElementById(tableId)
+  dvTable.innerHTML = ""
+  dvTable.appendChild(table)
 }
 
 /**
@@ -182,72 +182,72 @@ function generateTable(dataArray, tableClass, tableId) {
  * @param {string} message Text to be placed in pre element.
  */
 function appendPre(message) {
-  let pre = document.getElementById('content');
-  let textContent = document.createTextNode(message + '\n');
-  pre.appendChild(textContent);
+  let pre = document.getElementById('content')
+  let textContent = document.createTextNode(message + '\n')
+  pre.appendChild(textContent)
 }
 
 function listLinkTable(pagename, spreadSheetId, tableClass, tableId, range, linkToCol, linkFromCol) {
-  let linkToColIdx = linkToCol - 1;
-  let linkFromColIdx = linkFromCol - 1;
-  let pageRange = String(pagename) + "!" + range;
+  let linkToColIdx = linkToCol - 1
+  let linkFromColIdx = linkFromCol - 1
+  let pageRange = String(pagename) + "!" + range
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
-    let range = response.result;
+    let range = response.result
     if (range.values.length > 0) {
-      let dataArray = new Array();
+      let dataArray = new Array()
       for (row = 0; row < range.values.length; row++) {
-        let entry = range.values[row];
-        let dataRow = new Array();
+        let entry = range.values[row]
+        let dataRow = new Array()
         for (col = 0; col < entry.length; col++) {
           if (col == linkToColIdx) {
-            let link = entry[col];
+            let link = entry[col]
             if (row > 0) {
-              link = '<a href="' + entry[linkFromColIdx] + '" target="_parent">' + entry[col] + '</a>';
+              link = '<a href="' + entry[linkFromColIdx] + '" target="_parent">' + entry[col] + '</a>'
             }
-            dataRow.push(link);
+            dataRow.push(link)
           } else if (col != linkFromColIdx) {
-            dataRow.push(entry[col]);
+            dataRow.push(entry[col])
           }
         }
-        dataArray.push(dataRow);
+        dataArray.push(dataRow)
       }
-      generateTable(dataArray, tableClass, tableId);
+      generateTable(dataArray, tableClass, tableId)
     } else {
-      appendPre('Could not retrieve data');
+      appendPre('Could not retrieve data')
     }
   }, function(response) {
-    document.getElementById("menucontent").innerHTML = 'No information found';
-  });
+    document.getElementById("menucontent").innerHTML = 'No information found'
+  })
 }
 
 function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
-  let pageRange = String(pagename) + "!" + range;
+  let pageRange = String(pagename) + "!" + range
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
-    let range = response.result;
+    let range = response.result
     if (range.values.length > 0) {
-      let dataArray = new Array();
+      let dataArray = new Array()
       for (row = 0; row < range.values.length; row++) {
-        let entry = range.values[row];
-        let dataRow = new Array();
+        let entry = range.values[row]
+        let dataRow = new Array()
         for (col = 0; col < entry.length; col++) {
-          dataRow.push(entry[col]);
+          dataRow.push(entry[col])
         }
-        dataArray.push(dataRow);
+        dataArray.push(dataRow)
       }
-      generateTable(dataArray, tableClass, tableId);
+      generateTable(dataArray, tableClass, tableId)
     } else {
-      appendPre('Could not retrieve data');
+      appendPre('Could not retrieve data')
     }
   }, function(response) {
-    document.getElementById("menucontent").innerHTML = 'No information found';
-  });
+    document.getElementById("menucontent").innerHTML = 'No information found'
+  })
 }
 
