@@ -46,6 +46,7 @@ let spreadSheetIDs = {
 
 let websiteContactSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g';
 let articlesSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g';
+let adminSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g';
 
 
 function loadSchedule(team, year) {
@@ -64,20 +65,27 @@ function loadRoster(team, year) {
   }
 }
 
+function loadAdmin() {
+  if (!gapi_init) {
+    delayedSpreadsheetAPICall = listAdmin.bind(null, adminSpreadSheetID)
+  } else {
+    listAdmin(adminSpreadSheetID)
+  }
+}
+
 function loadArticles() {
   if (!gapi_init) {
     delayedSpreadsheetAPICall = listArticles.bind(null, articlesSpreadSheetID)
   } else {
-    listRoster(articlesSpreadSheetID)
+    listArticles(articlesSpreadSheetID)
   }
 }
 
 function loadWebsiteContact() {
-  let page = 'Contacts-Other';
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listWebsiteContact.bind(null, page, websiteContactSpreadSheetID, 'A3');
+    delayedSpreadsheetAPICall = listWebsiteContact.bind(null, websiteContactSpreadSheetID);
   } else {
-    listWebsiteContact(page, websiteContactSpreadSheetID, 'A3');
+    listWebsiteContact(websiteContactSpreadSheetID);
   }
 }
 
@@ -91,9 +99,38 @@ function listSchedule(team, year, spreadSheetId) {
   listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:F')
 }
 
+function listAdmin(spreadSheetId) {
+  let page = 'Contacts-Admin';
+  listTable(page, spreadSheetId, 'admin', 'adminId', 'A3:D')
+}
+
 function listArticles(spreadSheetId) {
   let page = 'Articles';
   listLinkTable(page, spreadSheetId, 'article', 'articleId', 'A3:D', 2, 4)
+}
+
+function listWebsiteContact(spreadSheetId) {
+  let range = 'A3';
+  let pageName = 'Contacts-Other';
+  let pageRange = String(pageName) + "!" + range;
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: spreadSheetId,
+    key: MOHI_APIKEY,
+    range: pageRange
+  }).then(function(response) {
+    let range = response.result;
+    if (range.values.length > 0) {
+      let entry = range.values[0];
+      if (entry.length > 0) {
+        let content = entry[0];
+        document.getElementById("menucontent").innerHTML = content;
+        return;
+      }
+    }
+    appendPre('Could not retrieve data');
+  }, function(response) {
+    document.getElementById("menucontent").innerHTML = 'No information found';
+  });
 }
 
 function generateTable(dataArray, tableClass, tableId) {
@@ -209,28 +246,6 @@ function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
     } else {
       appendPre('Could not retrieve data');
     }
-  }, function(response) {
-    document.getElementById("menucontent").innerHTML = 'No information found';
-  });
-}
-
-function listWebsiteContact(pageName, spreadSheetId, range) {
-  let pageRange = String(pageName) + "!" + range;
-  gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: spreadSheetId,
-    key: MOHI_APIKEY,
-    range: pageRange
-  }).then(function(response) {
-    let range = response.result;
-    if (range.values.length > 0) {
-      let entry = range.values[0];
-      if (entry.length > 0) {
-        let content = entry[0];
-        document.getElementById("menucontent").innerHTML = content;
-        return;
-      }
-    }
-    appendPre('Could not retrieve data');
   }, function(response) {
     document.getElementById("menucontent").innerHTML = 'No information found';
   });

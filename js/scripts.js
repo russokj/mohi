@@ -17,7 +17,6 @@ function showMenuDiv(menuID) {
     case "coaches": displayCoaches(); break;
     case "administration": displayAdministration(); break;
     case "website": displayWebsite(); break;
-    default: displayTBD(); break;
   }
 }
 
@@ -81,11 +80,6 @@ function getYear() {
 
 function nop() {
   return true;
-}
-
-
-function displayTBD() {
-  document.getElementById("menucontent").innerHTML = "This page is under construction";
 }
 
 
@@ -187,7 +181,9 @@ function displayCoaches() {
 
 
 function displayAdministration() {
-  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
+  document.getElementById("menucontent").innerHTML =
+    '<center>Monarch Girls Basketball Program Contacts</center>' + '<div id="adminId" class="admin">retrieving ...</div>';
+  loadAdmin();
 }
 
 
