@@ -17,6 +17,7 @@ function showMenuDiv(menuID) {
     case "coaches": displayCoaches(); break;
     case "administration": displayAdministration(); break;
     case "website": displayWebsite(); break;
+    default: displayUnknown(); break;
   }
 }
 
@@ -176,6 +177,11 @@ function displayArticles() {
 
 
 function displayCoaches() {
+  document.getElementById("menucontent").innerHTML = 'TBD - The teaming is excited about a new coach to lead a fully returning Varsity team for the upcoming season!!';
+}
+
+
+function displayUnknown() {
   document.getElementById("menucontent").innerHTML = 'Coming Soon!';
 }
 
