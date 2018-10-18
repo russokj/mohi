@@ -65,6 +65,7 @@ function setYear(year) {
   changed = element.value != year;
   element.value = year;
   localStorage.setItem("season", year);
+  localStorage.setItem("photoIdx", -1);
   return changed;
 }
 
@@ -92,12 +93,11 @@ function displayHome() {
 }
 
 
-localStorage.setItem("photoIdx", 0);
-
 // TODO: Must retrieve these from spreadsheet (as well as images, and not depend on naming convention!)
 const maxPhoto = {
  "2016-2017": 40,
  "2017-2018": 31,
+ "2018-2019": 0,
 };
 
 
@@ -109,9 +109,15 @@ function displayPhotos() {
   }
 
   let year = getYear();
+  let photoCnt = maxPhoto[year]
+  if (photoCnt === 0) {
+    displayUnknown();
+    return
+  }
+
   let photoIdx = parseInt(localStorage.getItem("photoIdx"));
   photoIdx = photoIdx + 1;
-  photoIdx = photoIdx % maxPhoto[year];
+  photoIdx = photoIdx % photoCnt;
   localStorage.setItem("photoIdx", photoIdx);
 
   let photoPath = "img/" + year + "/" + photoIdx.toString() + ".jpg";
@@ -177,12 +183,9 @@ function displayArticles() {
 
 
 function displayCoaches() {
-  document.getElementById("menucontent").innerHTML = 'TBD - The teaming is excited about a new coach to lead a fully returning Varsity team for the upcoming season!!';
-}
-
-
-function displayUnknown() {
-  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
+  document.getElementById("menucontent").innerHTML =
+    '<center>Monarch Girls Basketball Program Coaches</center>' + '<div id="coachesId" class="coaches">retrieving ...</div>';
+  loadCoaches();
 }
 
 
@@ -196,4 +199,9 @@ function displayAdministration() {
 function displayWebsite() {
   document.getElementById("menucontent").innerHTML = '';
   loadWebsiteContact();
+}
+
+
+function displayUnknown() {
+  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
 }

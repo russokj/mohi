@@ -38,15 +38,19 @@ function initClient() {
   })
 }
 
-// Need to pull these from master selector spreadsheet and base it off of year
+// TODO: Need to pull these from master selector spreadsheet and base it off of year
 let spreadSheetIDs = {
+'2018-2019': '19zaPGXGRSTMDu4qk9MKA6RjFtZZ9JvFyBRXdn5v0WoQ',
 '2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
 '2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 }
 
-let websiteContactSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
-let articlesSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
-let adminSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
+// The 'main' speadsheet'
+let mainSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
+let websiteContactSpreadSheetID = mainSpreadSheetID
+let articlesSpreadSheetID = mainSpreadSheetID
+let adminSpreadSheetID = mainSpreadSheetID
+let coachesSpreadSheetID = mainSpreadSheetID
 
 
 function loadSchedule(team, year) {
@@ -70,6 +74,14 @@ function loadAdmin() {
     delayedSpreadsheetAPICall = listAdmin.bind(null, adminSpreadSheetID)
   } else {
     listAdmin(adminSpreadSheetID)
+  }
+}
+
+function loadCoaches() {
+  if (!gapi_init) {
+    delayedSpreadsheetAPICall = listCoaches.bind(null, coachesSpreadSheetID)
+  } else {
+    listCoaches(coachesSpreadSheetID)
   }
 }
 
@@ -99,6 +111,7 @@ function listSchedule(team, year, spreadSheetId) {
   listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:F')
 }
 
+// TODO: Make links for email/website
 function listAdmin(spreadSheetId) {
   let page = 'Contacts-Admin'
   listTable(page, spreadSheetId, 'admin', 'adminId', 'A3:D')
@@ -107,6 +120,12 @@ function listAdmin(spreadSheetId) {
 function listArticles(spreadSheetId) {
   let page = 'Articles'
   listLinkTable(page, spreadSheetId, 'article', 'articleId', 'A3:D', 2, 4)
+}
+
+// TODO: WE DONT WANT THIS IN TABLE FORM
+function listCoaches(spreadSheetId) {
+  let page = 'Contacts-Coaches'
+  listTable(page, spreadSheetId, 'coaches', 'coachesId', 'A3:D')
 }
 
 function listWebsiteContact(spreadSheetId) {
