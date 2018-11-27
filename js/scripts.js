@@ -129,7 +129,7 @@ function displayPhotos() {
 
 function displayCalendar() {
   // TODO: must autogenerate the calendar_redirect.html so we can add a start date
-  document.getElementById("menucontent").innerHTML = '<iframe src="calendar_redirect.html" type="application/pdf" style="border:none;" height="600" width="100%"/>';
+  document.getElementById("menucontent").innerHTML = '<iframe src="https://calendar.google.com/calendar/embed?src=mohigirlsbasketball%40gmail.com&ctz=America%2FDenver" style="border: 0" frameborder="0" scrolling="no"></iframe>';
 }
 
 

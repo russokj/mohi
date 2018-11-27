@@ -108,7 +108,7 @@ function listRoster(team, year, spreadSheetId) {
 
 function listSchedule(team, year, spreadSheetId) {
   let page = year + '_' + team + '_SCHEDULE'
-  listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:F')
+  listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:G')
 }
 
 // TODO: Make links for email/website
