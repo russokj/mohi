@@ -95,9 +95,9 @@ function displayHome() {
 
 // TODO: Must retrieve these from spreadsheet (as well as images, and not depend on naming convention!)
 const maxPhoto = {
- "2016-2017": 40,
+ "2016-2017": 41,
  "2017-2018": 31,
- "2018-2019": 0,
+ "2018-2019": 27,
 };
 
 
