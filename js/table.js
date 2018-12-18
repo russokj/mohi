@@ -51,6 +51,7 @@ let websiteContactSpreadSheetID = mainSpreadSheetID
 let articlesSpreadSheetID = mainSpreadSheetID
 let adminSpreadSheetID = mainSpreadSheetID
 let coachesSpreadSheetID = mainSpreadSheetID
+let eventsSpreadSheetID = mainSpreadSheetID
 
 
 function loadSchedule(team, year) {
@@ -93,6 +94,14 @@ function loadArticles() {
   }
 }
 
+function loadEvents() {
+  if (!gapi_init) {
+    delayedSpreadsheetAPICall = listEvents.bind(null, eventsSpreadSheetID)
+  } else {
+    listEvents(eventsSpreadSheetID)
+  }
+}
+
 function loadWebsiteContact() {
   if (!gapi_init) {
     delayedSpreadsheetAPICall = listWebsiteContact.bind(null, websiteContactSpreadSheetID)
@@ -120,6 +129,11 @@ function listAdmin(spreadSheetId) {
 function listArticles(spreadSheetId) {
   let page = 'Articles'
   listLinkTable(page, spreadSheetId, 'article', 'articleId', 'A3:D', 2, 4)
+}
+
+function listEvents(spreadSheetId) {
+  let page = 'Events'
+  listTable(page, spreadSheetId, 'events', 'eventsId', 'A3:C')
 }
 
 // TODO: WE DONT WANT THIS IN TABLE FORM

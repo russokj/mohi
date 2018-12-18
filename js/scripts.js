@@ -6,6 +6,7 @@ function showMenuDiv(menuID) {
   switch (menuID) {
     case "home": displayHome(); break;
     case "calendar": displayCalendar(); break;
+    case "events": displayEvents(); break;
     case "varsityroster": displayVarsityRoster(); break;
     case "jvroster": displayJvRoster(); break;
     case "croster": displayCRoster(); break;
@@ -127,9 +128,16 @@ function displayPhotos() {
 }
 
 
+// TODO: Need to fix for IOS: see https://stackoverflow.com/questions/23083462/how-to-get-an-iframe-to-be-responsive-in-ios-safari (search for #wrap)
 function displayCalendar() {
-  // TODO: must autogenerate the calendar_redirect.html so we can add a start date
-  document.getElementById("menucontent").innerHTML = '<iframe src="https://calendar.google.com/calendar/embed?src=mohigirlsbasketball%40gmail.com&ctz=America%2FDenver&showTitle=0&showPrint=0&showTabs=0&showCalendars=0&showTz=0&height=600&wkst=1" style="border: 0" frameborder="0" height="600" width="100%" scrolling="no"></iframe>';
+  document.getElementById("menucontent").innerHTML = '<iframe src="https://calendar.google.com/calendar/embed?src=mohigirlsbasketball%40gmail.com&ctz=America%2FDenver&showTitle=1&showPrint=0&showTabs=1&showCalendars=1&showTz=0&height=600" style="border: 0" frameborder="0" height="600" width="100%" scrolling="no"></iframe>';
+}
+
+
+function displayEvents() {
+  document.getElementById("menucontent").innerHTML =
+    '<center>Upcoming Events</center>' + '<div id="eventsId" class="events">retrieving ...</div>';
+  loadEvents();
 }
 
 
