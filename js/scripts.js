@@ -99,6 +99,7 @@ const maxPhoto = {
  "2016-2017": 41,
  "2017-2018": 31,
  "2018-2019": 52,
+ "2019-2020": 9,
 };
 
 
@@ -116,7 +117,8 @@ function displayPhotos() {
     return
   }
 
-  let photoIdx = parseInt(localStorage.getItem("photoIdx"));
+  let idxStr = localStorage.getItem("photoIdx");
+  let photoIdx = (idxStr) ? parseInt(idxStr) : 0
   photoIdx = photoIdx + 1;
   photoIdx = photoIdx % photoCnt;
   localStorage.setItem("photoIdx", photoIdx);

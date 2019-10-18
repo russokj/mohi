@@ -29,6 +29,7 @@ function initClient() {
     scope: SCOPES
   }).then(function () {
     gapi_init = true
+    // retrieveYears()
     if (delayedSpreadsheetAPICall) {
       delayedSpreadsheetAPICall()
       delayedSpreadsheetAPICall = null
@@ -39,20 +40,58 @@ function initClient() {
 }
 
 // TODO: Need to pull these from master selector spreadsheet and base it off of year
+// let spreadSheetIDsNew = new map()
 let spreadSheetIDs = {
+'2019-2020': '129axJ7uPVBkac6ZTSbR0UQecN67RUeXV62G8FdFHTUU',
 '2018-2019': '19zaPGXGRSTMDu4qk9MKA6RjFtZZ9JvFyBRXdn5v0WoQ',
 '2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
 '2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 }
+const DEFAULT_SEASON = '2016-2017'
+const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 
-// The 'main' speadsheet'
+
+// TODO: Figure out why it throws exception after first entry.
+//       Convert to proper map
+//       Extract ID from link
+//       Replace list above
+//       Replace html
+
+// Spreadsheets that are independent of the year
+// (note: these currently reference a single spreadsheet that has multiple tabs.  The variables here are just to
+//        give extra flexibility in case the tabs are turned into their own spreadsheets.)
 let mainSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
 let websiteContactSpreadSheetID = mainSpreadSheetID
 let articlesSpreadSheetID = mainSpreadSheetID
 let adminSpreadSheetID = mainSpreadSheetID
 let coachesSpreadSheetID = mainSpreadSheetID
 let eventsSpreadSheetID = mainSpreadSheetID
+let yearSpreadSheetID = mainSpreadSheetID
 
+
+function retrieveYears() {
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: mainSpreadSheetID,
+    key: MOHI_APIKEY,
+    range: 'A8:B'
+  }).then(function(response) {
+    spreadSheetIDsNew.clear()
+    let range = response.result
+    if (range.values.length > 0) {
+      let dataArray = new Array()
+      for (row = 0; row < range.values.length; row++) {
+        let entry = range.values[row]
+        let dataRow = new Array()
+        let season = entry[0]
+        let link = entry[1]
+        alert(season + ": " + link)
+        spreadSheetIDsNew.set(season, link)
+      }
+    } else {
+      spreadSheetIDsNew.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
+    }
+  })
+}
 
 function loadSchedule(team, year) {
   if (!gapi_init) {
@@ -111,12 +150,12 @@ function loadWebsiteContact() {
 }
 
 function listRoster(team, year, spreadSheetId) {
-  let page = year + '_' + team + '_ROSTER'
+  let page = team + '_ROSTER'
   listTable(page, spreadSheetId, 'roster', 'rosterId', 'A1:E')
 }
 
 function listSchedule(team, year, spreadSheetId) {
-  let page = year + '_' + team + '_SCHEDULE'
+  let page = team + '_SCHEDULE'
   listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:G')
 }
 
