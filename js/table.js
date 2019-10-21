@@ -13,6 +13,7 @@ let delayedSpreadsheetAPICall = null
 /**
  *  On load, called to load the auth2 library and API client library.
  */
+// TODO: What if we call this before OnLoad?
 function handleClientLoad() {
   gapi.load('client', initClient)
 }
@@ -22,14 +23,17 @@ function handleClientLoad() {
  *  listeners.
  */
 function initClient() {
-  // TODO: only do first time
+  // NOTE: This is done on every page switch
+  // FIXME: Could try and do this only on an initial load
+  //        (Also seems to be called after the page attempts to load)
   gapi.client.init({
     discoveryDocs: DISCOVERY_DOCS,
     apiKey: MOHI_APIKEY,
     scope: SCOPES
   }).then(function () {
     gapi_init = true
-    // retrieveYears()
+    checkForCookieReset()
+    retrieveYears()
     if (delayedSpreadsheetAPICall) {
       delayedSpreadsheetAPICall()
       delayedSpreadsheetAPICall = null
@@ -39,27 +43,19 @@ function initClient() {
   })
 }
 
-// TODO: Need to pull these from master selector spreadsheet and base it off of year
-// let spreadSheetIDsNew = new map()
-let spreadSheetIDs = {
-'2019-2020': '129axJ7uPVBkac6ZTSbR0UQecN67RUeXV62G8FdFHTUU',
-'2018-2019': '19zaPGXGRSTMDu4qk9MKA6RjFtZZ9JvFyBRXdn5v0WoQ',
-'2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
-'2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
-}
+// TODO: call this Map to distinguish from yearSpreadSheetID!!! as well as localStorage
+let yearSpreadSheetIDs = new Map()
 const DEFAULT_SEASON = '2016-2017'
 const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 
 
-// TODO: Figure out why it throws exception after first entry.
-//       Convert to proper map
-//       Extract ID from link
-//       Replace list above
+// TODO:
 //       Replace html
 
 // Spreadsheets that are independent of the year
 // (note: these currently reference a single spreadsheet that has multiple tabs.  The variables here are just to
 //        give extra flexibility in case the tabs are turned into their own spreadsheets.)
+// TODO: constants should be capitalized or something; localstorage names should be constants
 let mainSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
 let websiteContactSpreadSheetID = mainSpreadSheetID
 let articlesSpreadSheetID = mainSpreadSheetID
@@ -67,45 +63,84 @@ let adminSpreadSheetID = mainSpreadSheetID
 let coachesSpreadSheetID = mainSpreadSheetID
 let eventsSpreadSheetID = mainSpreadSheetID
 let yearSpreadSheetID = mainSpreadSheetID
+let cookieResetSpreadSheetID = mainSpreadSheetID
 
 
-function retrieveYears() {
+function checkForCookieReset() {
+  let range = 'A6'
+  let pagename = 'Clear-Cookies'
+  let pageRange = pagename + "!" + range
   gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: mainSpreadSheetID,
+    spreadsheetId: cookieResetSpreadSheetID,
     key: MOHI_APIKEY,
-    range: 'A8:B'
+    range: pageRange
   }).then(function(response) {
-    spreadSheetIDsNew.clear()
     let range = response.result
     if (range.values.length > 0) {
-      let dataArray = new Array()
-      for (row = 0; row < range.values.length; row++) {
-        let entry = range.values[row]
-        let dataRow = new Array()
-        let season = entry[0]
-        let link = entry[1]
-        alert(season + ": " + link)
-        spreadSheetIDsNew.set(season, link)
+      let entry = range.values[0]
+      let cookieID = entry[0]
+      if (localStorage.getItem('cookieID') !== cookieID) {
+        localStorage.removeItem('photoIdx')
+        localStorage.removeItem('season')
+        localStorage.removeItem('yearSpreadSheetIDs')
+        localStorage.setItem('cookieID', cookieID)
       }
     } else {
-      spreadSheetIDsNew.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
+      yearSpreadSheetIDs.clear()
+      yearSpreadSheetIDs.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
     }
   })
 }
 
+
+function retrieveYears() {
+  // Get list of seasons and the spreadsheet IDs associated with each
+  if (localStorage.getItem('yearSpreadSheetIDs')) {
+    yearSpreadSheetIDs = new Map(JSON.parse(localStorage.getItem('yearSpreadSheetIDs')));
+  } else {
+    let range = 'A8:B'
+    let pagename = 'Seasons'
+    let pageRange = pagename + "!" + range
+    gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: yearSpreadSheetID,
+      key: MOHI_APIKEY,
+      range: pageRange
+    }).then(function(response) {
+      yearSpreadSheetIDs.clear()
+      let range = response.result
+      if (range.values.length > 0) {
+        let dataArray = new Array()
+        for (row = 0; row < range.values.length; row++) {
+          let entry = range.values[row]
+          let dataRow = new Array()
+          let season = entry[0]
+          let link = entry[1];
+          let id = link.split("/")[5]
+          yearSpreadSheetIDs.set(season, id)
+        }
+        localStorage.setItem('yearSpreadSheetIDs', JSON.stringify(Array.from(yearSpreadSheetIDs)))
+      } else {
+        yearSpreadSheetIDs.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
+      }
+    })
+  }
+  setYearDropdown()
+}
+
+// TODO: What's the difference between year and spreradhSheetIDs.get(year)? Why not do check in the code itself
 function loadSchedule(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listSchedule.bind(null, team, year, spreadSheetIDs[year])
+    delayedSpreadsheetAPICall = listSchedule.bind(null, team, year)
   } else {
-    listSchedule(team, year, spreadSheetIDs[year])
+    listSchedule(team, year)
   }
 }
 
 function loadRoster(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listRoster.bind(null, team, year, spreadSheetIDs[year])
+    delayedSpreadsheetAPICall = listRoster.bind(null, team, year)
   } else {
-    listRoster(team, year, spreadSheetIDs[year])
+    listRoster(team, year)
   }
 }
 
@@ -149,13 +184,15 @@ function loadWebsiteContact() {
   }
 }
 
-function listRoster(team, year, spreadSheetId) {
+function listRoster(team, year) {
   let page = team + '_ROSTER'
+  let spreadSheetId = yearSpreadSheetIDs.get(year)
   listTable(page, spreadSheetId, 'roster', 'rosterId', 'A1:E')
 }
 
-function listSchedule(team, year, spreadSheetId) {
+function listSchedule(team, year) {
   let page = team + '_SCHEDULE'
+  let spreadSheetId = yearSpreadSheetIDs.get(year)
   listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:G')
 }
 
@@ -211,7 +248,7 @@ function generateTable(dataArray, tableClass, tableId) {
 
   // Create a HTML Table element.
   let table = document.createElement('TABLE')
-  // TODO: Should tie name to class 
+  // TODO: Should tie name to class
   table.setAttribute('class', tableClass)
 
   //Get the count of columns.

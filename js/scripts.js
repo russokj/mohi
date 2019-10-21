@@ -81,6 +81,21 @@ function getYear() {
 }
 
 
+function setYearDropdown() {
+  let select = document.getElementById("selectYear");
+  let seasons = [...yearSpreadSheetIDs.keys()]
+  for(var i = 0; i < seasons.length; i++) {
+    var opt = seasons[i];
+    var el = document.createElement("option");
+    el.textContent = opt;
+    el.value = opt;
+    select.appendChild(el);
+  }
+  let year = localStorage.getItem("season");
+  document.getElementById("selectYear").value = year;
+}
+
+
 function nop() {
   return true;
 }
