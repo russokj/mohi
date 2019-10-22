@@ -67,17 +67,17 @@ let cookieResetSpreadSheetID = mainSpreadSheetID
 
 
 function checkForCookieReset() {
-  let range = 'A6'
+  let cells = 'A6'
   let pagename = 'Clear-Cookies'
-  let pageRange = pagename + "!" + range
+  let pageRange = pagename + "!" + cells
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: cookieResetSpreadSheetID,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
-    let range = response.result
-    if (range.values.length > 0) {
-      let entry = range.values[0]
+    let rows = response.result
+    if (rows.values.length > 0) {
+      let entry = rows.values[0]
       let cookieID = entry[0]
       if (localStorage.getItem('cookieID') !== cookieID) {
         localStorage.removeItem('photoIdx')
@@ -89,6 +89,8 @@ function checkForCookieReset() {
       yearSpreadSheetIDs.clear()
       yearSpreadSheetIDs.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
     }
+  }, function(reason) {
+    alert('error: ' + reason.result.error.message)
   })
 }
 
@@ -98,20 +100,20 @@ function retrieveYears() {
   if (localStorage.getItem('yearSpreadSheetIDs')) {
     yearSpreadSheetIDs = new Map(JSON.parse(localStorage.getItem('yearSpreadSheetIDs')));
   } else {
-    let range = 'A8:B'
+    let cells = 'A8:B'
     let pagename = 'Seasons'
-    let pageRange = pagename + "!" + range
+    let pageRange = pagename + "!" + cells
     gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: yearSpreadSheetID,
       key: MOHI_APIKEY,
       range: pageRange
     }).then(function(response) {
       yearSpreadSheetIDs.clear()
-      let range = response.result
-      if (range.values.length > 0) {
+      let rows = response.result
+      if (rows.values.length > 0) {
         let dataArray = new Array()
-        for (row = 0; row < range.values.length; row++) {
-          let entry = range.values[row]
+        for (row = 0; row < rows.values.length; row++) {
+          let entry = rows.values[row]
           let dataRow = new Array()
           let season = entry[0]
           let link = entry[1];
@@ -122,12 +124,16 @@ function retrieveYears() {
       } else {
         yearSpreadSheetIDs.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
       }
+    }, function(reason) {
+      alert('error: ' + reason.result.error.message)
     })
   }
   setYearDropdown()
 }
 
-// TODO: What's the difference between year and spreradhSheetIDs.get(year)? Why not do check in the code itself
+// 
+// Load functions are for any menu item(s) that needs access to the google APIs 
+//
 function loadSchedule(team, year) {
   if (!gapi_init) {
     delayedSpreadsheetAPICall = listSchedule.bind(null, team, year)
@@ -219,17 +225,17 @@ function listCoaches(spreadSheetId) {
 }
 
 function listWebsiteContact(spreadSheetId) {
-  let range = 'A3'
+  let cells = 'A3'
   let pageName = 'Contacts-Other'
-  let pageRange = String(pageName) + "!" + range
+  let pageRange = String(pageName) + "!" + cells
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
-    let range = response.result
-    if (range.values.length > 0) {
-      let entry = range.values[0]
+    let rows = response.result
+    if (rows.values.length > 0) {
+      let entry = rows.values[0]
       if (entry.length > 0) {
         let content = entry[0]
         document.getElementById("menucontent").innerHTML = content
@@ -296,20 +302,20 @@ function appendPre(message) {
   pre.appendChild(textContent)
 }
 
-function listLinkTable(pagename, spreadSheetId, tableClass, tableId, range, linkToCol, linkFromCol) {
+function listLinkTable(pagename, spreadSheetId, tableClass, tableId, cells, linkToCol, linkFromCol) {
   let linkToColIdx = linkToCol - 1
   let linkFromColIdx = linkFromCol - 1
-  let pageRange = String(pagename) + "!" + range
+  let pageRange = String(pagename) + "!" + cells
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
-    let range = response.result
-    if (range.values.length > 0) {
+    let rows = response.result
+    if (rows.values.length > 0) {
       let dataArray = new Array()
-      for (row = 0; row < range.values.length; row++) {
-        let entry = range.values[row]
+      for (row = 0; row < rows.values.length; row++) {
+        let entry = rows.values[row]
         let dataRow = new Array()
         for (col = 0; col < entry.length; col++) {
           if (col == linkToColIdx) {
@@ -333,18 +339,18 @@ function listLinkTable(pagename, spreadSheetId, tableClass, tableId, range, link
   })
 }
 
-function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
-  let pageRange = String(pagename) + "!" + range
+function listTable(pagename, spreadSheetId, tableClass, tableId, cells) {
+  let pageRange = String(pagename) + "!" + cells
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: spreadSheetId,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
-    let range = response.result
-    if (range.values.length > 0) {
+    let rows = response.result
+    if (rows.values.length > 0) {
       let dataArray = new Array()
-      for (row = 0; row < range.values.length; row++) {
-        let entry = range.values[row]
+      for (row = 0; row < rows.values.length; row++) {
+        let entry = rows.values[row]
         let dataRow = new Array()
         for (col = 0; col < entry.length; col++) {
           dataRow.push(entry[col])
