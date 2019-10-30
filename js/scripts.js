@@ -102,10 +102,14 @@ const maxPhoto = {
  "2019-2020": 9,
 };
 
+function clearBanner() {
+  document.getElementById('bannerwrapper').innerHTML = ""
+}
 
 let timeoutId = null;
 
 function displayPhotos() {
+  clearBanner()
   if (timeoutId) {
     clearTimeout(timeoutId);
   }
@@ -132,11 +136,13 @@ function displayPhotos() {
 
 // TODO: Need to fix for IOS: see https://stackoverflow.com/questions/23083462/how-to-get-an-iframe-to-be-responsive-in-ios-safari (search for #wrap)
 function displayCalendar() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML = '<iframe src="https://calendar.google.com/calendar/embed?src=mohigirlsbasketball%40gmail.com&ctz=America%2FDenver&showTitle=1&showPrint=0&showTabs=1&showCalendars=1&showTz=0&height=600" style="border: 0" frameborder="0" height="600" width="100%" scrolling="no"></iframe>';
 }
 
 
 function displayEvents() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>Upcoming Events</center>' + '<div id="eventsId" class="events">retrieving ...</div>';
   loadEvents();
@@ -144,6 +150,7 @@ function displayEvents() {
 
 
 function displayVarsityRoster() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' Varsity Team Roster</center><div id="rosterId" class="roster">retrieving ...</div>';
   loadRoster('VARSITY', getYear());
@@ -151,6 +158,7 @@ function displayVarsityRoster() {
 
 
 function displayJvRoster() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' JV Team Roster</center><div id="rosterId" class="roster">retrieving ...</div>';
   loadRoster('JV', getYear());
@@ -158,6 +166,7 @@ function displayJvRoster() {
 
 
 function displayCRoster() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' C Team Roster</center><div id="rosterId" class="roster">retrieving ...</div>';
   loadRoster('C', getYear());
@@ -165,6 +174,7 @@ function displayCRoster() {
 
 
 function displayVarsitySchedule() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' Varsity Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
   loadSchedule('VARSITY', getYear());
@@ -172,6 +182,7 @@ function displayVarsitySchedule() {
 
 
 function displayJvSchedule() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' JV Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
   loadSchedule('JV', getYear());
@@ -179,6 +190,7 @@ function displayJvSchedule() {
 
 
 function displayCSchedule() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' C Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
   loadSchedule('C', getYear());
@@ -186,6 +198,7 @@ function displayCSchedule() {
 
 
 function displayArticles() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>Monarch Girls in the News</center>' + '<div id="articleId" class="article">retrieving ...</div>';
   loadArticles();
@@ -193,6 +206,7 @@ function displayArticles() {
 
 
 function displayCoaches() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>Monarch Girls Basketball Program Coaches</center>' + '<div id="coachesId" class="coaches">retrieving ...</div>';
   loadCoaches();
@@ -200,6 +214,7 @@ function displayCoaches() {
 
 
 function displayAdministration() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML =
     '<center>Monarch Girls Basketball Program Contacts</center>' + '<div id="adminId" class="admin">retrieving ...</div>';
   loadAdmin();
@@ -207,6 +222,7 @@ function displayAdministration() {
 
 
 function displayWebsite() {
+  clearBanner()
   document.getElementById("menucontent").innerHTML = '';
   loadWebsiteContact();
 }

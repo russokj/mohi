@@ -10,6 +10,17 @@ h1 {
   line-height: 50%
 }
 
+#bannerdiv {
+  text-align: center;
+  padding: 10px;
+  background-color: black;
+}
+
+#bannerlink {
+  background-color: black;
+  color: goldenrod;
+}
+
 div.normalDiv {
   margin-top: 10px;
 }
