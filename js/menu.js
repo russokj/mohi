@@ -75,7 +75,6 @@ function responsiveMultiMenu() {
 				if(width>0){
 					maxWidth += width;
 				}
-				console.log(width)
 			}
 		});
 
