@@ -1,10 +1,13 @@
 // Array of API discovery doc URLs for APIs used by the quickstart
-let DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"]
+let DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",
+                      "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
+
 let MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-let SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly"
+let SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
+              'https://www.googleapis.com/auth/drive.readonly']
 
 let gapi_init = false
 let delayedSpreadsheetAPICall = null
@@ -34,6 +37,7 @@ function initClient() {
       delayedSpreadsheetAPICall()
       delayedSpreadsheetAPICall = null
     }
+    retrievePhotoFolderIds()
   }, function(reason) {
     alert('Error: ' + reason.result.error.message)
   })
@@ -47,6 +51,7 @@ let spreadSheetIDs = {
 '2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
 '2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 }
+
 const DEFAULT_SEASON = '2016-2017'
 const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 
@@ -323,3 +328,39 @@ function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
   })
 }
 
+
+let MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
+// TODO: move to photos file?
+// Create map of year to ID
+// Remove the need for a spreadsheet to do this but add documentation about the directory names
+// When photos are selected, index into map to get ID, if nothing found print appropriate error
+// Get list of files (want the URL list this time).  Then run periodic update and randomly select a photo to display
+// https://drive.google.com/uc?export=view&id=
+// FUTURE: fade in and out
+
+//    'fields': "nextPageToken, files(id, name)"
+//    mimeType='img/gif'
+
+function retrievePhotoFolderIds() {
+  // the google drive ID for the 'photos' folder
+  let photoFolderID = "'1zoSGrQTMX10X99eB71ORTaPMWeih_CL3'"
+  gapi.client.drive.files.list({
+    key: MOHI_DRIVE_APIKEY,
+    pageSize: 1000,
+    q: photoFolderID + " in parents and mimeType = 'application/vnd.google-apps.folder'",
+    fields: "files(id, name)"
+  }).then(function(response) {
+    console.log('Files:')
+    var files = response.result.files
+    if (files && files.length > 0) {
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i]
+        console.log(file.name + ' (' + file.id + ')')
+      }
+    } else {
+      console.log('No files found.')
+    }
+  }, function(response) {
+    console.log(response)
+  })
+}
