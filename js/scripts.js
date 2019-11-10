@@ -1,6 +1,33 @@
-currentMenuID = "home";
+
+let currentMenuID = "home";
+let photoTimeoutID = null;
+let preLoadedImage = new Image()
 
 
+function pageReload() {
+  // This unfortunately comes before Google API CB is called
+  // (so we need to defer the action for displaying in showMenuDiv
+  // if it requires access to a google spreadsheet/doc)
+  var menuParam = getMenuParam('page');
+  if (!menuParam) {
+    menuParam = 'home';
+  }
+
+  let year = getYear();
+  setYear(year);
+
+  showMenuDiv(menuParam);
+}
+
+
+function jumpto(page) {
+  var path = window.location.pathname;
+  var url = path + '?page=' + page;
+  document.location.href = url;
+}
+
+
+// Called when user selects a new year
 function showMenuDiv(menuID) {
   currentMenuID = menuID;
   switch (menuID) {
@@ -22,7 +49,7 @@ function showMenuDiv(menuID) {
   }
 }
 
-function getParam(sname) {
+function getMenuParam(sname) {
   var params = location.search.substr(location.search.indexOf("?")+1);
   var sval = "";
   params = params.split("&");
@@ -35,26 +62,6 @@ function getParam(sname) {
   return sval;
 }
 
-function onload() {
-  var menuParam = getParam('page');
-  if (!menuParam) {
-    menuParam = 'home';
-  }
-
-  let year = getYear();
-  setYear(year);
-
-  showMenuDiv(menuParam);
-}
-
-function jumpto(page) {
-  var path = window.location.pathname;
-  var url = path + '?page=' + page;
-  document.location.href = url;
-}
-
-
-// Called when user selects a new year
 function yearChanged(year) {
   setYear(year);
   showMenuDiv(currentMenuID);
@@ -66,7 +73,6 @@ function setYear(year) {
   changed = element.value != year;
   element.value = year;
   localStorage.setItem("season", year);
-  localStorage.setItem("photoIdx", -1);
   return changed;
 }
 
@@ -93,44 +99,43 @@ function displayHome() {
     '<img id="homeimg" src="' + photoPath + '" border="0" alt="Monarch Proud">';
 }
 
-
-// TODO: Must retrieve these from spreadsheet (as well as images, and not depend on naming convention!)
-const maxPhoto = {
- "2016-2017": 41,
- "2017-2018": 31,
- "2018-2019": 52,
- "2019-2020": 9,
-};
-
 function clearBanner() {
   document.getElementById('bannerwrapper').innerHTML = ""
 }
 
-let timeoutId = null;
 
-function displayPhotos() {
-  clearBanner()
-  if (timeoutId) {
-    clearTimeout(timeoutId);
-  }
-
-  let year = getYear();
-  let photoCnt = maxPhoto[year]
+function showPhotosCB(photoList) {
+  let photoCnt = photoList.length
   if (photoCnt === 0) {
     displayUnknown();
     return
   }
 
-  let idxStr = localStorage.getItem("photoIdx");
-  let photoIdx = (idxStr) ? parseInt(idxStr) : 0
-  photoIdx = photoIdx + 1;
-  photoIdx = photoIdx % photoCnt;
-  localStorage.setItem("photoIdx", photoIdx);
+  let photoIdx = Math.floor(Math.random() * photoCnt + 1)
 
-  let photoPath = "img/" + year + "/" + photoIdx.toString() + ".jpg";
+  // TODO: if preloadedImage.src is not set  then set it; 
+  let photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
   let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">';
   document.getElementById("menucontent").innerHTML = innerHtml;
-  timeoutId = setTimeout(displayPhotos, 5500);
+  photoTimeoutID = setTimeout(showPhotos, 5500);
+}
+
+function showPhotos() {
+  if (photoTimeoutID) {
+    clearTimeout(photoTimeoutID);
+  }
+
+  // TODO: If year changes, need to clear photo list so we re-retrieve it
+  // What if there are no files? What i
+  let year = getYear();
+  retrievePhotosList(year, showPhotosCB)
+}
+
+function displayPhotos() {
+  clearBanner()
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' Photo Gallery</center><div id="photosId" class="photos">retrieving ...</div>';
+  loadPhotos(showPhotos);
 }
 
 

@@ -1,16 +1,21 @@
 // Array of API discovery doc URLs for APIs used by the quickstart
-let DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",
-                      "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
+const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",
+                        "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
 
-let MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
+const MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
+const PHOTO_FOLDER_ID = "'1zoSGrQTMX10X99eB71ORTaPMWeih_CL3'"
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-let SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
-              'https://www.googleapis.com/auth/drive.readonly']
+const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
+                'https://www.googleapis.com/auth/drive.readonly']
+
+const DEFAULT_SEASON = '2016-2017'
+const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 
 let gapi_init = false
 let delayedSpreadsheetAPICall = null
+let photoYearSpreadsheetIDs = new Map()
 
 
 /**
@@ -25,7 +30,7 @@ function handleClientLoad() {
  *  listeners.
  */
 function initClient() {
-  // TODO: only do first time
+  // note: this is called on every page change (reload)
   gapi.client.init({
     discoveryDocs: DISCOVERY_DOCS,
     apiKey: MOHI_APIKEY,
@@ -33,11 +38,11 @@ function initClient() {
   }).then(function () {
     gapi_init = true
     // retrieveYears()
+    retrievePhotoFolderIds()
     if (delayedSpreadsheetAPICall) {
       delayedSpreadsheetAPICall()
       delayedSpreadsheetAPICall = null
     }
-    retrievePhotoFolderIds()
   }, function(reason) {
     alert('Error: ' + reason.result.error.message)
   })
@@ -51,9 +56,6 @@ let spreadSheetIDs = {
 '2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
 '2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 }
-
-const DEFAULT_SEASON = '2016-2017'
-const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 
 
 // TODO: Figure out why it throws exception after first entry.
@@ -89,7 +91,6 @@ function retrieveYears() {
         let dataRow = new Array()
         let season = entry[0]
         let link = entry[1]
-        alert(season + ": " + link)
         spreadSheetIDsNew.set(season, link)
       }
     } else {
@@ -135,6 +136,14 @@ function loadArticles() {
     delayedSpreadsheetAPICall = listArticles.bind(null, articlesSpreadSheetID)
   } else {
     listArticles(articlesSpreadSheetID)
+  }
+}
+
+function loadPhotos(photoHandler) {
+  if (!gapi_init) {
+    delayedSpreadsheetAPICall = photoHandler.bind(null)
+  } else {
+    photoHandler()
   }
 }
 
@@ -331,36 +340,80 @@ function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
 
 let MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
 // TODO: move to photos file?
-// Create map of year to ID
 // Remove the need for a spreadsheet to do this but add documentation about the directory names
 // When photos are selected, index into map to get ID, if nothing found print appropriate error
 // Get list of files (want the URL list this time).  Then run periodic update and randomly select a photo to display
 // https://drive.google.com/uc?export=view&id=
 // FUTURE: fade in and out
 
-//    'fields': "nextPageToken, files(id, name)"
-//    mimeType='img/gif'
+// SEEMS TO BE CALLED TWICE
 
 function retrievePhotoFolderIds() {
+  photoYearSpreadsheetIDs.clear()
+  let photoYearSpreadsheetIDsJSON = sessionStorage.getItem('photoYearSpreadsheetIDs')
+  if (photoYearSpreadsheetIDsJSON) {
+    photoYearSpreadsheetIDsArr = JSON.parse(photoYearSpreadsheetIDsJSON)
+    if (photoYearSpreadsheetIDsArr.length > 0) {
+      photoYearSpreadsheetIDs = new Map(photoYearSpreadsheetIDsArr)
+      return
+    }
+  }
+
   // the google drive ID for the 'photos' folder
-  let photoFolderID = "'1zoSGrQTMX10X99eB71ORTaPMWeih_CL3'"
+  let photoFolderSpreadsheetID = PHOTO_FOLDER_ID
   gapi.client.drive.files.list({
     key: MOHI_DRIVE_APIKEY,
     pageSize: 1000,
-    q: photoFolderID + " in parents and mimeType = 'application/vnd.google-apps.folder'",
+    q: photoFolderSpreadsheetID + " in parents and mimeType = 'application/vnd.google-apps.folder'",
     fields: "files(id, name)"
   }).then(function(response) {
-    console.log('Files:')
-    var files = response.result.files
-    if (files && files.length > 0) {
-      for (var i = 0; i < files.length; i++) {
-        var file = files[i]
-        console.log(file.name + ' (' + file.id + ')')
+    var seasons = response.result.files
+    if (seasons && seasons.length > 0) {
+      for (var i = 0; i < seasons.length; i++) {
+        var season = seasons[i]
+        photoYearSpreadsheetIDs.set(season.name, season.id)
       }
     } else {
-      console.log('No files found.')
+      console.log('No seasons found for photos.')
     }
+    photoYearSpreadsheetIDsJSON = JSON.stringify(Array.from(photoYearSpreadsheetIDs))
+    sessionStorage.setItem('photoYearSpreadsheetIDs', photoYearSpreadsheetIDsJSON)
   }, function(response) {
     console.log(response)
+  })
+}
+
+// We have the season list (map of season folders, now we need to get any images
+// from that particular season
+// TODO: possible optimization is to store list locally and clear on year select
+//       change. Only then do we retrieve the new list.
+function retrievePhotosList(season, retrievePhotosListCB) {
+  let photosArr = []
+  let photoFolderID = photoYearSpreadsheetIDs.get(season)
+  if (!photoFolderID) {
+    console.log('Cannot find season folder for ' + season)
+    return photosArr
+  }
+ 
+  let query = "'" + photoFolderID + "' in parents and mimeType = 'image/jpeg'"
+  gapi.client.drive.files.list({
+    key: MOHI_DRIVE_APIKEY,
+    pageSize: 1000,
+    q: query,
+    fields: "files(name, id)"
+  }).then(function(response) {
+    var photos = response.result.files
+    if (photos && photos.length > 0) {
+      for (var i = 0; i < photos.length; i++) {
+        var photo = photos[i]
+        photosArr.push(photo.id)
+      }
+    } else {
+      console.log('No photos found for season ' + season)
+    }
+    retrievePhotosListCB(photosArr)
+  }, function(response) {
+    console.log(response)
+    retrievePhotosListCB(photosArr)
   })
 }
