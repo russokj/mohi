@@ -37,7 +37,6 @@ function initClient() {
     scope: SCOPES
   }).then(function () {
     gapi_init = true
-    // retrieveYears()
     retrievePhotoFolderIds()
     if (delayedSpreadsheetAPICall) {
       delayedSpreadsheetAPICall()
@@ -73,30 +72,14 @@ let articlesSpreadSheetID = mainSpreadSheetID
 let adminSpreadSheetID = mainSpreadSheetID
 let coachesSpreadSheetID = mainSpreadSheetID
 let eventsSpreadSheetID = mainSpreadSheetID
-let yearSpreadSheetID = mainSpreadSheetID
 
 
-function retrieveYears() {
-  gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: mainSpreadSheetID,
-    key: MOHI_APIKEY,
-    range: 'A8:B'
-  }).then(function(response) {
-    spreadSheetIDsNew.clear()
-    let range = response.result
-    if (range.values.length > 0) {
-      let dataArray = new Array()
-      for (row = 0; row < range.values.length; row++) {
-        let entry = range.values[row]
-        let dataRow = new Array()
-        let season = entry[0]
-        let link = entry[1]
-        spreadSheetIDsNew.set(season, link)
-      }
-    } else {
-      spreadSheetIDsNew.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
-    }
-  })
+function loadHome(homeHandler) {
+  if (!gapi_init) {
+    delayedSpreadsheetAPICall = homeHandler.bind(null)
+  } else {
+    homeHandler()
+  }
 }
 
 function loadSchedule(team, year) {
@@ -210,11 +193,11 @@ function listWebsiteContact(spreadSheetId) {
       if (entry.length > 0) {
         let content = entry[0]
         document.getElementById("menucontent").innerHTML = content
-        return
       }
     }
     appendPre('Could not retrieve data')
   }, function(response) {
+    console.log("Failed to retrieve website contact information: " + response.result.error)
     document.getElementById("menucontent").innerHTML = 'No information found'
   })
 }
@@ -225,7 +208,7 @@ function generateTable(dataArray, tableClass, tableId) {
 
   // Create a HTML Table element.
   let table = document.createElement('TABLE')
-  // TODO: Should tie name to class 
+  // TODO: Should tie name to class
   table.setAttribute('class', tableClass)
 
   //Get the count of columns.
@@ -285,10 +268,10 @@ function listLinkTable(pagename, spreadSheetId, tableClass, tableId, range, link
     let range = response.result
     if (range.values.length > 0) {
       let dataArray = new Array()
-      for (row = 0; row < range.values.length; row++) {
+      for (let row = 0; row < range.values.length; row++) {
         let entry = range.values[row]
         let dataRow = new Array()
-        for (col = 0; col < entry.length; col++) {
+        for (let col = 0; col < entry.length; col++) {
           if (col == linkToColIdx) {
             let link = entry[col]
             if (row > 0) {
@@ -306,6 +289,7 @@ function listLinkTable(pagename, spreadSheetId, tableClass, tableId, range, link
       appendPre('Could not retrieve data')
     }
   }, function(response) {
+    console.log("Failed to retrieve list-link table information: " + response.result.error)
     document.getElementById("menucontent").innerHTML = 'No information found'
   })
 }
@@ -320,10 +304,10 @@ function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
     let range = response.result
     if (range.values.length > 0) {
       let dataArray = new Array()
-      for (row = 0; row < range.values.length; row++) {
+      for (let row = 0; row < range.values.length; row++) {
         let entry = range.values[row]
         let dataRow = new Array()
-        for (col = 0; col < entry.length; col++) {
+        for (let col = 0; col < entry.length; col++) {
           dataRow.push(entry[col])
         }
         dataArray.push(dataRow)
@@ -333,6 +317,7 @@ function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
       appendPre('Could not retrieve data')
     }
   }, function(response) {
+    console.log("Failed to retrieve table information: " + response.result.error)
     document.getElementById("menucontent").innerHTML = 'No information found'
   })
 }
@@ -352,7 +337,7 @@ function retrievePhotoFolderIds() {
   photoYearSpreadsheetIDs.clear()
   let photoYearSpreadsheetIDsJSON = sessionStorage.getItem('photoYearSpreadsheetIDs')
   if (photoYearSpreadsheetIDsJSON) {
-    photoYearSpreadsheetIDsArr = JSON.parse(photoYearSpreadsheetIDsJSON)
+    let photoYearSpreadsheetIDsArr = JSON.parse(photoYearSpreadsheetIDsJSON)
     if (photoYearSpreadsheetIDsArr.length > 0) {
       photoYearSpreadsheetIDs = new Map(photoYearSpreadsheetIDsArr)
       return
@@ -383,6 +368,7 @@ function retrievePhotoFolderIds() {
   })
 }
 
+
 // We have the season list (map of season folders, now we need to get any images
 // from that particular season
 // TODO: possible optimization is to store list locally and clear on year select
@@ -392,9 +378,10 @@ function retrievePhotosList(season, retrievePhotosListCB) {
   let photoFolderID = photoYearSpreadsheetIDs.get(season)
   if (!photoFolderID) {
     console.log('Cannot find season folder for ' + season)
-    return photosArr
+    retrievePhotosListCB(photosArr)
+    return
   }
- 
+
   let query = "'" + photoFolderID + "' in parents and mimeType = 'image/jpeg'"
   gapi.client.drive.files.list({
     key: MOHI_DRIVE_APIKEY,
@@ -402,10 +389,10 @@ function retrievePhotosList(season, retrievePhotosListCB) {
     q: query,
     fields: "files(name, id)"
   }).then(function(response) {
-    var photos = response.result.files
+    let photos = response.result.files
     if (photos && photos.length > 0) {
-      for (var i = 0; i < photos.length; i++) {
-        var photo = photos[i]
+      for (let i = 0; i < photos.length; i++) {
+        let photo = photos[i]
         photosArr.push(photo.id)
       }
     } else {
@@ -415,5 +402,43 @@ function retrievePhotosList(season, retrievePhotosListCB) {
   }, function(response) {
     console.log(response)
     retrievePhotosListCB(photosArr)
+  })
+}
+
+
+// We have the season list (map of season folders, now we need to get any images
+// from that particular season
+// TODO: possible optimization is to store list locally and clear on year select
+//       change. Only then do we retrieve the new list.
+function retrieveHomePhoto(season, retrieveHomePhotoCB) {
+  let photoFolderID = photoYearSpreadsheetIDs.get(season)
+  if (!photoFolderID) {
+    console.log('Cannot find season folder for ' + season)
+    retrieveHomePhotoCB(null)
+    return null
+  }
+
+  let query = "'" + photoFolderID + "' in parents and mimeType = 'image/jpeg'"
+  gapi.client.drive.files.list({
+    key: MOHI_DRIVE_APIKEY,
+    pageSize: 1000,
+    q: query,
+    fields: "files(name, id)"
+  }).then(function(response) {
+    let photos = response.result.files
+    if (photos) {
+      for (let i = 0; i < photos.length; i++) {
+        let photo = photos[i]
+        if (photo.name === "home.jpg") {
+          retrieveHomePhotoCB(photo.id)
+          return
+        }
+      }
+    }
+    console.log('home.jpg not found for season ' + season)
+    retrieveHomePhotoCB(null)
+  }, function(response) {
+    console.log(response)
+    retrieveHomePhotoCB(null)
   })
 }

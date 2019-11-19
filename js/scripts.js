@@ -1,7 +1,8 @@
 
 let currentMenuID = "home";
 let photoTimeoutID = null;
-let preLoadedImage = new Image()
+let imageIdx = -1;
+let preLoadedImages = new Array();
 
 
 function pageReload() {
@@ -49,6 +50,7 @@ function showMenuDiv(menuID) {
   }
 }
 
+
 function getMenuParam(sname) {
   var params = location.search.substr(location.search.indexOf("?")+1);
   var sval = "";
@@ -56,11 +58,12 @@ function getMenuParam(sname) {
 
   // split param and value into individual pieces
   for (var i=0; i<params.length; i++) {
-    temp = params[i].split("=");
+    let temp = params[i].split("=");
     if ( [temp[0]] == sname ) { sval = temp[1]; }
   }
   return sval;
 }
+
 
 function yearChanged(year) {
   setYear(year);
@@ -69,8 +72,8 @@ function yearChanged(year) {
 
 
 function setYear(year) {
-  element = document.getElementById("selectYear");
-  changed = element.value != year;
+  let element = document.getElementById("selectYear");
+  let changed = element.value != year;
   element.value = year;
   localStorage.setItem("season", year);
   return changed;
@@ -87,55 +90,91 @@ function getYear() {
 }
 
 
+function clearBanner() {
+  document.getElementById('bannerwrapper').innerHTML = ""
+}
+
+
 function nop() {
   return true;
 }
 
 
-function displayHome() {
-  let year = getYear();
-  let photoPath = "img/" + year + "/" + "home.jpg";
-  document.getElementById("menucontent").innerHTML =
-    '<img id="homeimg" src="' + photoPath + '" border="0" alt="Monarch Proud">';
+function showHomeCB(homePhoto) {
+  let photoPath = "https://drive.google.com/uc?export=view&id=" + homePhoto
+  let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">'
+  document.getElementById("menucontent").innerHTML = innerHtml
 }
 
-function clearBanner() {
-  document.getElementById('bannerwrapper').innerHTML = ""
+function showHome() {
+  // TODO: If year changes, need to clear photo list so we re-retrieve it
+  // What if there are no files? What i
+  let year = getYear()
+  retrieveHomePhoto(year, showHomeCB)
+}
+
+function displayHome() {
+  let year = getYear();
+  let photoPath = "img/" + year + "/" + "home.jpg"
+  document.getElementById("menucontent").innerHTML =
+    '<img id="homeimg" src="' + photoPath + '" border="0" alt="Monarch Proud">'
+
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' Home Page</center><div id="homeId" class="home">retrieving ...</div>'
+  loadHome(showHome)
 }
 
 
 function showPhotosCB(photoList) {
   let photoCnt = photoList.length
   if (photoCnt === 0) {
-    displayUnknown();
+    displayUnknown()
     return
   }
+/*
+  // first time, load image
+  if (imageIdx == -1) {
+    preLoadedImages[0] = new Image()
+    let photoIdx = Math.floor(Math.random() * photoCnt + 1)
+    let photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
+    alert(photoPath)
+    preLoadedImages[0].src = photoPath
+    imageIdx = 0
+  }
 
-  let photoIdx = Math.floor(Math.random() * photoCnt + 1)
-
-  // TODO: if preloadedImage.src is not set  then set it; 
+  // show image
   let photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
-  let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">';
-  document.getElementById("menucontent").innerHTML = innerHtml;
-  photoTimeoutID = setTimeout(showPhotos, 5500);
+  let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">'
+  document.getElementById("menucontent").innerHTML = innerHtml
+  photoTimeoutID = setTimeout(showPhotos, 5500)
+
+  // get next image
+  let nextImageIdx = imageIdx % 2
+  preLoadedImages[nextImageIdx] = new Image()
+  let photoIdx = Math.floor(Math.random() * photoCnt + 1)
+  let photoPathNext = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
+  alert(photoPathNext)
+  preLoadedImages[0].src = photoPathNext
+  imageIdx = 0
+*/
 }
 
 function showPhotos() {
   if (photoTimeoutID) {
-    clearTimeout(photoTimeoutID);
+    clearTimeout(photoTimeoutID)
   }
 
   // TODO: If year changes, need to clear photo list so we re-retrieve it
   // What if there are no files? What i
-  let year = getYear();
+  let year = getYear()
   retrievePhotosList(year, showPhotosCB)
 }
 
 function displayPhotos() {
   clearBanner()
   document.getElementById("menucontent").innerHTML =
-    '<center>' + getYear() + ' Photo Gallery</center><div id="photosId" class="photos">retrieving ...</div>';
-  loadPhotos(showPhotos);
+    '<center>' + getYear() + ' Photo Gallery</center><div id="photosId" class="photos">retrieving ...</div>'
+  loadPhotos(showPhotos)
 }
 
 

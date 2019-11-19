@@ -29,7 +29,7 @@ function adaptMenu() {
 
 		// compare width
 		var width = $('.rmm').css('max-width');
-		width = width.replace('px', ''); 
+		width = width.replace('px', '');
 		
 		if ( $(this).parent().width() > width ) {
 			$('.rmm-menu').removeClass("rmm-mobile");
