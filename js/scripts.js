@@ -129,32 +129,29 @@ function showPhotosCB(photoList) {
     displayUnknown()
     return
   }
-/*
-  // first time, load image
+
+  // first time, pre-load image
+  let photoIdx
+  let photoPath
   if (imageIdx == -1) {
-    preLoadedImages[0] = new Image()
-    let photoIdx = Math.floor(Math.random() * photoCnt + 1)
-    let photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
-    alert(photoPath)
-    preLoadedImages[0].src = photoPath
     imageIdx = 0
+    photoIdx = Math.floor(Math.random() * photoCnt + 1)
+    photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
+    preLoadedImages[imageIdx] = new Image()
+    preLoadedImages[imageIdx].src = photoPath
   }
 
-  // show image
-  let photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
-  let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">'
+  // show image pointed to by imageIdx
+  let innerHtml = '<img class="photoGallary" src="' + preLoadedImages[imageIdx].src + '", style="width:100%">'
   document.getElementById("menucontent").innerHTML = innerHtml
   photoTimeoutID = setTimeout(showPhotos, 5500)
 
-  // get next image
-  let nextImageIdx = imageIdx % 2
-  preLoadedImages[nextImageIdx] = new Image()
-  let photoIdx = Math.floor(Math.random() * photoCnt + 1)
-  let photoPathNext = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
-  alert(photoPathNext)
-  preLoadedImages[0].src = photoPathNext
-  imageIdx = 0
-*/
+  // get next image (toggle between array indice 0 & 1
+  imageIdx = imageIdx % 2
+  photoIdx = Math.floor(Math.random() * photoCnt + 1)
+  photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
+  preLoadedImages[imageIdx] = new Image()
+  preLoadedImages[imageIdx].src = photoPath
 }
 
 function showPhotos() {
@@ -163,7 +160,7 @@ function showPhotos() {
   }
 
   // TODO: If year changes, need to clear photo list so we re-retrieve it
-  // What if there are no files? What i
+  // What if there are no files? Can we clear all associated lists on year change?
   let year = getYear()
   retrievePhotosList(year, showPhotosCB)
 }
