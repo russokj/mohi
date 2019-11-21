@@ -331,8 +331,6 @@ let MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
 // https://drive.google.com/uc?export=view&id=
 // FUTURE: fade in and out
 
-// SEEMS TO BE CALLED TWICE
-
 function retrievePhotoFolderIds() {
   photoYearSpreadsheetIDs.clear()
   let photoYearSpreadsheetIDsJSON = sessionStorage.getItem('photoYearSpreadsheetIDs')
@@ -406,11 +404,29 @@ function retrievePhotosList(season, retrievePhotosListCB) {
 }
 
 
-// We have the season list (map of season folders, now we need to get any images
-// from that particular season
-// TODO: possible optimization is to store list locally and clear on year select
-//       change. Only then do we retrieve the new list.
+// Retrieve the home.jpg file ID for the selected season
+// 1. At this point we have the season list, so we need to retrieve
+//    all files to find one named 'home.jpg'
+// 2. Once retrieved we should add this to the local storage as a map
+//    so we can skip step 1 in the future
+// 3. Whether we retrieved the ID from cache or google, return it in the
+//    callback function.
 function retrieveHomePhoto(season, retrieveHomePhotoCB) {
+  // See if we already have retrieved this info
+  let homePhotoYearSpreadsheetIDs = new Map()
+  let homePhotoYearIDsJSON = sessionStorage.getItem('homePhotoYearSpreadsheetIDs')
+  if (homePhotoYearIDsJSON) {
+    let homePhotoYearSpreadsheetIDsArr = JSON.parse(homePhotoYearIDsJSON)
+    if (homePhotoYearSpreadsheetIDsArr.length > 0) {
+      homePhotoYearSpreadsheetIDs = new Map(homePhotoYearSpreadsheetIDsArr)
+      let homePhotoID = homePhotoYearSpreadsheetIDs.get(season)
+      if (homePhotoID) {
+        retrieveHomePhotoCB(homePhotoID)
+        return
+      }
+    }
+  }
+
   let photoFolderID = photoYearSpreadsheetIDs.get(season)
   if (!photoFolderID) {
     console.log('Cannot find season folder for ' + season)
@@ -430,6 +446,9 @@ function retrieveHomePhoto(season, retrieveHomePhotoCB) {
       for (let i = 0; i < photos.length; i++) {
         let photo = photos[i]
         if (photo.name === "home.jpg") {
+          homePhotoYearSpreadsheetIDs.set(season, photo.id)
+          homePhotoYearIDsJSON = JSON.stringify(Array.from(homePhotoYearSpreadsheetIDs))
+          sessionStorage.setItem('homePhotoYearSpreadsheetIDs', homePhotoYearIDsJSON)
           retrieveHomePhotoCB(photo.id)
           return
         }

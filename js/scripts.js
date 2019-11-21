@@ -107,8 +107,6 @@ function showHomeCB(homePhoto) {
 }
 
 function showHome() {
-  // TODO: If year changes, need to clear photo list so we re-retrieve it
-  // What if there are no files? What i
   let year = getYear()
   retrieveHomePhoto(year, showHomeCB)
 }
