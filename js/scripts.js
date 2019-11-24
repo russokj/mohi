@@ -67,7 +67,13 @@ function getMenuParam(sname) {
 
 function yearChanged(year) {
   setYear(year);
+
+  // Force retrieval and redisplay page
+  imageIdx = -1
+  gapi_init = false
+  clearPhotoTimer()
   showMenuDiv(currentMenuID);
+  initClientStage1()
 }
 
 
@@ -94,36 +100,51 @@ function clearBanner() {
   document.getElementById('bannerwrapper').innerHTML = ""
 }
 
+function setBanner() {
+  // TODO: Retrieve content from google
+  let bannerText = null
+  if (bannerText) {
+    document.getElementById('bannerwrapper').innerHTML = "<div id=\"bannerdiv\"><a id=\"bannerlink\" href=\"javascript:jumpto('events');\">" + bannerText + "</a></div>"
+  }
+}
+
 
 function nop() {
   return true;
 }
 
 
-function showHomeCB(homePhoto) {
-  let photoPath = "https://drive.google.com/uc?export=view&id=" + homePhoto
+function showHome() {
+  let year = getYear()
+  let photoID = getHomePagePhoto(year)
+  let photoPath = "https://drive.google.com/uc?export=view&id=" + photoID
   let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">'
   document.getElementById("menucontent").innerHTML = innerHtml
 }
 
-function showHome() {
-  let year = getYear()
-  retrieveHomePhoto(year, showHomeCB)
-}
-
 function displayHome() {
+  setBanner()
   let year = getYear();
-  let photoPath = "img/" + year + "/" + "home.jpg"
-  document.getElementById("menucontent").innerHTML =
-    '<img id="homeimg" src="' + photoPath + '" border="0" alt="Monarch Proud">'
-
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' Home Page</center><div id="homeId" class="home">retrieving ...</div>'
   loadHome(showHome)
 }
 
 
-function showPhotosCB(photoList) {
+function clearPhotoTimer() {
+    clearTimeout(photoTimeoutID)
+    photoTimeoutID = null
+}
+
+function showPhotos() {
+  if (photoTimeoutID) {
+    clearPhotoTimer()
+  }
+
+  // TODO: If year changes, need to clear photo list so we re-retrieve it
+  // What if there are no files? Can we clear all associated lists on year change?
+  let year = getYear()
+  let photoList = getPhotoList(year)
   let photoCnt = photoList.length
   if (photoCnt === 0) {
     displayUnknown()
@@ -135,7 +156,7 @@ function showPhotosCB(photoList) {
   let photoPath
   if (imageIdx == -1) {
     imageIdx = 0
-    photoIdx = Math.floor(Math.random() * photoCnt + 1)
+    photoIdx = Math.floor(Math.random() * photoCnt)
     photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
     preLoadedImages[imageIdx] = new Image()
     preLoadedImages[imageIdx].src = photoPath
@@ -148,21 +169,10 @@ function showPhotosCB(photoList) {
 
   // get next image (toggle between array indice 0 & 1
   imageIdx = imageIdx % 2
-  photoIdx = Math.floor(Math.random() * photoCnt + 1)
+  photoIdx = Math.floor(Math.random() * photoCnt)
   photoPath = "https://drive.google.com/uc?export=view&id=" + photoList[photoIdx]
   preLoadedImages[imageIdx] = new Image()
   preLoadedImages[imageIdx].src = photoPath
-}
-
-function showPhotos() {
-  if (photoTimeoutID) {
-    clearTimeout(photoTimeoutID)
-  }
-
-  // TODO: If year changes, need to clear photo list so we re-retrieve it
-  // What if there are no files? Can we clear all associated lists on year change?
-  let year = getYear()
-  retrievePhotosList(year, showPhotosCB)
 }
 
 function displayPhotos() {

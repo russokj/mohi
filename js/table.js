@@ -13,9 +13,10 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
 const DEFAULT_SEASON = '2016-2017'
 const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 
+// flag to delay loading of page if it needs to retrieve data from google
 let gapi_init = false
 let delayedSpreadsheetAPICall = null
-let photoYearSpreadsheetIDs = new Map()
+let photoYearFolderIDs = new Map()
 
 
 /**
@@ -36,20 +37,34 @@ function initClient() {
     apiKey: MOHI_APIKEY,
     scope: SCOPES
   }).then(function () {
-    gapi_init = true
-    retrievePhotoFolderIds()
-    if (delayedSpreadsheetAPICall) {
-      delayedSpreadsheetAPICall()
-      delayedSpreadsheetAPICall = null
-    }
+    initClientStage1()
   }, function(reason) {
     alert('Error: ' + reason.result.error.message)
   })
 }
 
-// TODO: Need to pull these from master selector spreadsheet and base it off of year
-// let spreadSheetIDsNew = new map()
-let spreadSheetIDs = {
+function initClientStage1() {
+    retrievePhotoFolderIds()
+}
+
+function initClientStage2() {
+    retrievePhotosIds()
+}
+
+function initClientStage3() {
+    gapi_init = true
+    invokeDelayedPageLoad()
+}
+
+function invokeDelayedPageLoad() {
+  if (delayedSpreadsheetAPICall) {
+    delayedSpreadsheetAPICall()
+    delayedSpreadsheetAPICall = null
+  }
+}
+
+
+let yearSpreadSheetIDs = {
 '2019-2020': '129axJ7uPVBkac6ZTSbR0UQecN67RUeXV62G8FdFHTUU',
 '2018-2019': '19zaPGXGRSTMDu4qk9MKA6RjFtZZ9JvFyBRXdn5v0WoQ',
 '2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
@@ -84,17 +99,17 @@ function loadHome(homeHandler) {
 
 function loadSchedule(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listSchedule.bind(null, team, year, spreadSheetIDs[year])
+    delayedSpreadsheetAPICall = listSchedule.bind(null, team, year, yearSpreadSheetIDs[year])
   } else {
-    listSchedule(team, year, spreadSheetIDs[year])
+    listSchedule(team, year, yearSpreadSheetIDs[year])
   }
 }
 
 function loadRoster(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listRoster.bind(null, team, year, spreadSheetIDs[year])
+    delayedSpreadsheetAPICall = listRoster.bind(null, team, year, yearSpreadSheetIDs[year])
   } else {
-    listRoster(team, year, spreadSheetIDs[year])
+    listRoster(team, year, yearSpreadSheetIDs[year])
   }
 }
 
@@ -332,12 +347,13 @@ let MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
 // FUTURE: fade in and out
 
 function retrievePhotoFolderIds() {
-  photoYearSpreadsheetIDs.clear()
-  let photoYearSpreadsheetIDsJSON = sessionStorage.getItem('photoYearSpreadsheetIDs')
-  if (photoYearSpreadsheetIDsJSON) {
-    let photoYearSpreadsheetIDsArr = JSON.parse(photoYearSpreadsheetIDsJSON)
-    if (photoYearSpreadsheetIDsArr.length > 0) {
-      photoYearSpreadsheetIDs = new Map(photoYearSpreadsheetIDsArr)
+  photoYearFolderIDs.clear()
+  let photoYearFolderIDsJSON = sessionStorage.getItem('photoYearFolderIDs')
+  if (photoYearFolderIDsJSON) {
+    let photoYearFolderIDsArr = JSON.parse(photoYearFolderIDsJSON)
+    if (photoYearFolderIDsArr.length > 0) {
+      photoYearFolderIDs = new Map(photoYearFolderIDsArr)
+      initClientStage2()
       return
     }
   }
@@ -354,29 +370,43 @@ function retrievePhotoFolderIds() {
     if (seasons && seasons.length > 0) {
       for (var i = 0; i < seasons.length; i++) {
         var season = seasons[i]
-        photoYearSpreadsheetIDs.set(season.name, season.id)
+        photoYearFolderIDs.set(season.name, season.id)
       }
     } else {
       console.log('No seasons found for photos.')
     }
-    photoYearSpreadsheetIDsJSON = JSON.stringify(Array.from(photoYearSpreadsheetIDs))
-    sessionStorage.setItem('photoYearSpreadsheetIDs', photoYearSpreadsheetIDsJSON)
+    photoYearFolderIDsJSON = JSON.stringify(Array.from(photoYearFolderIDs))
+    sessionStorage.setItem('photoYearFolderIDs', photoYearFolderIDsJSON)
+    initClientStage2()
   }, function(response) {
     console.log(response)
   })
 }
 
 
-// We have the season list (map of season folders, now we need to get any images
-// from that particular season
-// TODO: possible optimization is to store list locally and clear on year select
-//       change. Only then do we retrieve the new list.
-function retrievePhotosList(season, retrievePhotosListCB) {
-  let photosArr = []
-  let photoFolderID = photoYearSpreadsheetIDs.get(season)
+// Retrieves the list of photos for the current season as well as the home page image
+// 1. If we previously retrieved these values, use the values from the local storage
+// 2. Otherwise retrieve the list (array) of photos and also determine the homepage image.
+function retrievePhotosIds() {
+   season = getYear()
+
+  // See if we already retrieved the home photo ID and list of photos for the season
+  let photoIDs = []
+  let homePhotoID = sessionStorage.getItem('homePhotoID_' + season)
+  let photoIDsJSON = sessionStorage.getItem('photoIDs_' + season)
+  if (photoIDsJSON) {
+    photoIDs = JSON.parse(photoIDsJSON)
+  }
+  if (photoIDs && photoIDs.length > 0  && homePhotoID) {
+    initClientStage3()
+    return
+  }
+
+  // Retrieve photos from google
+  let photoFolderID = photoYearFolderIDs.get(season)
   if (!photoFolderID) {
     console.log('Cannot find season folder for ' + season)
-    retrievePhotosListCB(photosArr)
+    initClientStage3()
     return
   }
 
@@ -387,77 +417,38 @@ function retrievePhotosList(season, retrievePhotosListCB) {
     q: query,
     fields: "files(name, id)"
   }).then(function(response) {
-    let photos = response.result.files
-    if (photos && photos.length > 0) {
-      for (let i = 0; i < photos.length; i++) {
-        let photo = photos[i]
-        photosArr.push(photo.id)
+    let results = response.result.files
+    if (results && results.length > 0) {
+      for (let i = 0; i < results.length; i++) {
+        photoIDs.push(results[i].id)
+        if (results[i].name === 'home.jpg') {
+          homePhotoID = results[i].id
+        }
       }
     } else {
       console.log('No photos found for season ' + season)
     }
-    retrievePhotosListCB(photosArr)
+    sessionStorage.setItem('homePhotoID_' + season, homePhotoID)
+    photoIDsJSON = JSON.stringify(photoIDs)
+    sessionStorage.setItem('photoIDs_' + season, photoIDsJSON)
+    initClientStage3()
   }, function(response) {
     console.log(response)
-    retrievePhotosListCB(photosArr)
+    initClientStage3()
   })
 }
 
 
-// Retrieve the home.jpg file ID for the selected season
-// 1. At this point we have the season list, so we need to retrieve
-//    all files to find one named 'home.jpg'
-// 2. Once retrieved we should add this to the local storage as a map
-//    so we can skip step 1 in the future
-// 3. Whether we retrieved the ID from cache or google, return it in the
-//    callback function.
-function retrieveHomePhoto(season, retrieveHomePhotoCB) {
-  // See if we already have retrieved this info
-  let homePhotoYearSpreadsheetIDs = new Map()
-  let homePhotoYearIDsJSON = sessionStorage.getItem('homePhotoYearSpreadsheetIDs')
-  if (homePhotoYearIDsJSON) {
-    let homePhotoYearSpreadsheetIDsArr = JSON.parse(homePhotoYearIDsJSON)
-    if (homePhotoYearSpreadsheetIDsArr.length > 0) {
-      homePhotoYearSpreadsheetIDs = new Map(homePhotoYearSpreadsheetIDsArr)
-      let homePhotoID = homePhotoYearSpreadsheetIDs.get(season)
-      if (homePhotoID) {
-        retrieveHomePhotoCB(homePhotoID)
-        return
-      }
-    }
+function getPhotoList(season) {
+  let photoIDs = []
+  let photoIDsJSON = sessionStorage.getItem('photoIDs_' + season)
+  if (photoIDsJSON) {
+    photoIDs = JSON.parse(photoIDsJSON)
   }
+  return photoIDs
+}
 
-  let photoFolderID = photoYearSpreadsheetIDs.get(season)
-  if (!photoFolderID) {
-    console.log('Cannot find season folder for ' + season)
-    retrieveHomePhotoCB(null)
-    return null
-  }
-
-  let query = "'" + photoFolderID + "' in parents and mimeType = 'image/jpeg'"
-  gapi.client.drive.files.list({
-    key: MOHI_DRIVE_APIKEY,
-    pageSize: 1000,
-    q: query,
-    fields: "files(name, id)"
-  }).then(function(response) {
-    let photos = response.result.files
-    if (photos) {
-      for (let i = 0; i < photos.length; i++) {
-        let photo = photos[i]
-        if (photo.name === "home.jpg") {
-          homePhotoYearSpreadsheetIDs.set(season, photo.id)
-          homePhotoYearIDsJSON = JSON.stringify(Array.from(homePhotoYearSpreadsheetIDs))
-          sessionStorage.setItem('homePhotoYearSpreadsheetIDs', homePhotoYearIDsJSON)
-          retrieveHomePhotoCB(photo.id)
-          return
-        }
-      }
-    }
-    console.log('home.jpg not found for season ' + season)
-    retrieveHomePhotoCB(null)
-  }, function(response) {
-    console.log(response)
-    retrieveHomePhotoCB(null)
-  })
+function getHomePagePhoto(season) {
+  let homePhotoID = sessionStorage.getItem('homePhotoID_' + season)
+  return homePhotoID
 }
