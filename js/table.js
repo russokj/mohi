@@ -10,12 +10,15 @@ const PHOTO_FOLDER_ID = "'1zoSGrQTMX10X99eB71ORTaPMWeih_CL3'"
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
                 'https://www.googleapis.com/auth/drive.readonly']
 
+// TODO: default season - is this needed? default spreadsheet id - what is this for?
+let yearSpreadSheetIDs = new Map()
 const DEFAULT_SEASON = '2016-2017'
 const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
 
+
 // flag to delay loading of page if it needs to retrieve data from google
 let gapi_init = false
-let delayedSpreadsheetAPICall = null
+let delayedPageLoadCB = null
 let photoYearFolderIDs = new Map()
 
 
@@ -43,55 +46,47 @@ function initClient() {
   })
 }
 
+// Some of these can be run in parallel
 function initClientStage1() {
-    retrievePhotoFolderIds()
+    retrieveRevisionID()
 }
 
 function initClientStage2() {
-    retrievePhotosIds()
+    retrieveYears()
 }
 
 function initClientStage3() {
-    gapi_init = true
-    invokeDelayedPageLoad()
+    setYearDropdown()
+    retrievePhotoFolderIds()
 }
 
-function invokeDelayedPageLoad() {
-  if (delayedSpreadsheetAPICall) {
-    delayedSpreadsheetAPICall()
-    delayedSpreadsheetAPICall = null
+function initClientStage4() {
+    retrievePhotosIds()
+}
+
+function initClientStage5() {
+    gapi_init = true
+    initClientDone()
+}
+
+function initClientDone() {
+  if (delayedPageLoadCB) {
+    delayedPageLoadCB()
+    delayedPageLoadCB = null
   }
 }
 
 
-let yearSpreadSheetIDs = {
-'2019-2020': '129axJ7uPVBkac6ZTSbR0UQecN67RUeXV62G8FdFHTUU',
-'2018-2019': '19zaPGXGRSTMDu4qk9MKA6RjFtZZ9JvFyBRXdn5v0WoQ',
-'2017-2018': '1OLYwhlO7Lmhw-mP4W6ugY2RMA5JZjG-cGGMPa6ZjC64',
-'2016-2017': '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
-}
-
-
-// TODO: Figure out why it throws exception after first entry.
-//       Convert to proper map
-//       Extract ID from link
-//       Replace list above
-//       Replace html
-
 // Spreadsheets that are independent of the year
 // (note: these currently reference a single spreadsheet that has multiple tabs.  The variables here are just to
 //        give extra flexibility in case the tabs are turned into their own spreadsheets.)
+// TODO: constants should be capitalized or something; localstorage & sessionstorage  names should be constants and distinguishiable as should globals
 let mainSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
-let websiteContactSpreadSheetID = mainSpreadSheetID
-let articlesSpreadSheetID = mainSpreadSheetID
-let adminSpreadSheetID = mainSpreadSheetID
-let coachesSpreadSheetID = mainSpreadSheetID
-let eventsSpreadSheetID = mainSpreadSheetID
 
 
 function loadHome(homeHandler) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = homeHandler.bind(null)
+    delayedPageLoadCB = homeHandler.bind(null)
   } else {
     homeHandler()
   }
@@ -99,47 +94,47 @@ function loadHome(homeHandler) {
 
 function loadSchedule(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listSchedule.bind(null, team, year, yearSpreadSheetIDs[year])
+    delayedPageLoadCB = listSchedule.bind(null, team, year)
   } else {
-    listSchedule(team, year, yearSpreadSheetIDs[year])
+    listSchedule(team, year)
   }
 }
 
 function loadRoster(team, year) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listRoster.bind(null, team, year, yearSpreadSheetIDs[year])
+    delayedPageLoadCB = listRoster.bind(null, team, year)
   } else {
-    listRoster(team, year, yearSpreadSheetIDs[year])
+    listRoster(team, year)
   }
 }
 
 function loadAdmin() {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listAdmin.bind(null, adminSpreadSheetID)
+    delayedPageLoadCB = listAdmin.bind(null)
   } else {
-    listAdmin(adminSpreadSheetID)
+    listAdmin()
   }
 }
 
 function loadCoaches() {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listCoaches.bind(null, coachesSpreadSheetID)
+    delayedPageLoadCB = listCoaches.bind(null)
   } else {
-    listCoaches(coachesSpreadSheetID)
+    listCoaches()
   }
 }
 
 function loadArticles() {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listArticles.bind(null, articlesSpreadSheetID)
+    delayedPageLoadCB = listArticles.bind(null)
   } else {
-    listArticles(articlesSpreadSheetID)
+    listArticles()
   }
 }
 
 function loadPhotos(photoHandler) {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = photoHandler.bind(null)
+    delayedPageLoadCB = photoHandler.bind(null)
   } else {
     photoHandler()
   }
@@ -147,58 +142,58 @@ function loadPhotos(photoHandler) {
 
 function loadEvents() {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listEvents.bind(null, eventsSpreadSheetID)
+    delayedPageLoadCB = listEvents.bind(null)
   } else {
-    listEvents(eventsSpreadSheetID)
+    listEvents()
   }
 }
 
 function loadWebsiteContact() {
   if (!gapi_init) {
-    delayedSpreadsheetAPICall = listWebsiteContact.bind(null, websiteContactSpreadSheetID)
+    delayedPageLoadCB = listWebsiteContact.bind(null)
   } else {
-    listWebsiteContact(websiteContactSpreadSheetID)
+    listWebsiteContact()
   }
 }
 
-function listRoster(team, year, spreadSheetId) {
+function listRoster(team, year) {
   let page = team + '_ROSTER'
-  listTable(page, spreadSheetId, 'roster', 'rosterId', 'A1:E')
+  listTable(page, yearSpreadSheetIDs.get(year), 'roster', 'rosterId', 'A1:E')
 }
 
-function listSchedule(team, year, spreadSheetId) {
+function listSchedule(team, year) {
   let page = team + '_SCHEDULE'
-  listTable(page, spreadSheetId, 'schedule', 'scheduleId', 'A1:G')
+  listTable(page, yearSpreadSheetIDs.get(year), 'schedule', 'scheduleId', 'A1:G')
 }
 
 // TODO: Make links for email/website
-function listAdmin(spreadSheetId) {
+function listAdmin() {
   let page = 'Contacts-Admin'
-  listTable(page, spreadSheetId, 'admin', 'adminId', 'A3:D')
+  listTable(page, mainSpreadSheetID, 'admin', 'adminId', 'A3:D')
 }
 
-function listArticles(spreadSheetId) {
+function listArticles() {
   let page = 'Articles'
-  listLinkTable(page, spreadSheetId, 'article', 'articleId', 'A3:D', 2, 4)
+  listLinkTable(page, mainSpreadSheetID, 'article', 'articleId', 'A3:D', 2, 4)
 }
 
-function listEvents(spreadSheetId) {
+function listEvents() {
   let page = 'Events'
-  listTable(page, spreadSheetId, 'events', 'eventsId', 'A3:C')
+  listTable(page, mainSpreadSheetID, 'events', 'eventsId', 'A3:C')
 }
 
 // TODO: WE DONT WANT THIS IN TABLE FORM
-function listCoaches(spreadSheetId) {
+function listCoaches() {
   let page = 'Contacts-Coaches'
-  listTable(page, spreadSheetId, 'coaches', 'coachesId', 'A3:D')
+  listTable(page, mainSpreadSheetID, 'coaches', 'coachesId', 'A3:D')
 }
 
-function listWebsiteContact(spreadSheetId) {
+function listWebsiteContact() {
   let range = 'A3'
   let pageName = 'Contacts-Other'
   let pageRange = String(pageName) + "!" + range
   gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: spreadSheetId,
+    spreadsheetId: mainSpreadSheetID,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
@@ -338,6 +333,75 @@ function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
 }
 
 
+function retrieveRevisionID() {
+  let cells = 'A6'
+  let pagename = 'Clear-Cookies'
+  let pageRange = pagename + "!" + cells
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: mainSpreadSheetID,
+    key: MOHI_APIKEY,
+    range: pageRange
+  }).then(function(response) {
+    let rows = response.result
+    if (rows.values.length > 0) {
+      let entry = rows.values[0]
+      let cookieID = entry[0]
+      if (localStorage.getItem('cookieID') !== cookieID) {
+        localStorage.removeItem('yearSpreadSheetIDs')
+        localStorage.removeItem('photoYearFolderIDs')
+        localStorage.setItem('cookieID', cookieID)
+      }
+    } else {
+      yearSpreadSheetIDs.clear()
+      yearSpreadSheetIDs.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
+    }
+    initClientStage2()
+  }, function(reason) {
+    alert('error: ' + reason.result.error.message)
+    initClientStage2()
+  })
+}
+
+
+function retrieveYears() {
+  // Get list of seasons and the spreadsheet IDs associated with each
+  if (localStorage.getItem('yearSpreadSheetIDs')) {
+    yearSpreadSheetIDs = new Map(JSON.parse(localStorage.getItem('yearSpreadSheetIDs')));
+    initClientStage3()
+  } else {
+    let cells = 'A8:B'
+    let pagename = 'Seasons'
+    let pageRange = pagename + "!" + cells
+    gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: mainSpreadSheetID,
+      key: MOHI_APIKEY,
+      range: pageRange
+    }).then(function(response) {
+      yearSpreadSheetIDs.clear()
+      let rows = response.result
+      if (rows.values.length > 0) {
+        let dataArray = new Array()
+        for (row = 0; row < rows.values.length; row++) {
+          let entry = rows.values[row]
+          let dataRow = new Array()
+          let season = entry[0]
+          let link = entry[1];
+          let id = link.split("/")[5]
+          yearSpreadSheetIDs.set(season, id)
+        }
+        localStorage.setItem('yearSpreadSheetIDs', JSON.stringify(Array.from(yearSpreadSheetIDs)))
+      } else {
+        yearSpreadSheetIDs.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
+      }
+      initClientStage3()
+    }, function(reason) {
+      alert('error: ' + reason.result.error.message)
+      initClientStage3()
+    })
+  }
+}
+
+
 let MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
 // TODO: move to photos file?
 // Remove the need for a spreadsheet to do this but add documentation about the directory names
@@ -348,12 +412,12 @@ let MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
 
 function retrievePhotoFolderIds() {
   photoYearFolderIDs.clear()
-  let photoYearFolderIDsJSON = sessionStorage.getItem('photoYearFolderIDs')
+  let photoYearFolderIDsJSON = localStorage.getItem('photoYearFolderIDs')
   if (photoYearFolderIDsJSON) {
     let photoYearFolderIDsArr = JSON.parse(photoYearFolderIDsJSON)
     if (photoYearFolderIDsArr.length > 0) {
       photoYearFolderIDs = new Map(photoYearFolderIDsArr)
-      initClientStage2()
+      initClientStage4()
       return
     }
   }
@@ -376,10 +440,11 @@ function retrievePhotoFolderIds() {
       console.log('No seasons found for photos.')
     }
     photoYearFolderIDsJSON = JSON.stringify(Array.from(photoYearFolderIDs))
-    sessionStorage.setItem('photoYearFolderIDs', photoYearFolderIDsJSON)
-    initClientStage2()
+    localStorage.setItem('photoYearFolderIDs', photoYearFolderIDsJSON)
+    initClientStage4()
   }, function(response) {
     console.log(response)
+    initClientStage4()
   })
 }
 
@@ -398,7 +463,7 @@ function retrievePhotosIds() {
     photoIDs = JSON.parse(photoIDsJSON)
   }
   if (photoIDs && photoIDs.length > 0  && homePhotoID) {
-    initClientStage3()
+    initClientStage5()
     return
   }
 
@@ -406,7 +471,7 @@ function retrievePhotosIds() {
   let photoFolderID = photoYearFolderIDs.get(season)
   if (!photoFolderID) {
     console.log('Cannot find season folder for ' + season)
-    initClientStage3()
+    initClientStage5()
     return
   }
 
@@ -431,10 +496,10 @@ function retrievePhotosIds() {
     sessionStorage.setItem('homePhotoID_' + season, homePhotoID)
     photoIDsJSON = JSON.stringify(photoIDs)
     sessionStorage.setItem('photoIDs_' + season, photoIDsJSON)
-    initClientStage3()
+    initClientStage5()
   }, function(response) {
     console.log(response)
-    initClientStage3()
+    initClientStage5()
   })
 }
 

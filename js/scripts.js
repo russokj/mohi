@@ -1,31 +1,7 @@
-
 let currentMenuID = "home";
 let photoTimeoutID = null;
 let imageIdx = -1;
 let preLoadedImages = new Array();
-
-
-function pageReload() {
-  // This unfortunately comes before Google API CB is called
-  // (so we need to defer the action for displaying in showMenuDiv
-  // if it requires access to a google spreadsheet/doc)
-  var menuParam = getMenuParam('page');
-  if (!menuParam) {
-    menuParam = 'home';
-  }
-
-  let year = getYear();
-  setYear(year);
-
-  showMenuDiv(menuParam);
-}
-
-
-function jumpto(page) {
-  var path = window.location.pathname;
-  var url = path + '?page=' + page;
-  document.location.href = url;
-}
 
 
 // Called when user selects a new year
@@ -62,6 +38,29 @@ function getMenuParam(sname) {
     if ( [temp[0]] == sname ) { sval = temp[1]; }
   }
   return sval;
+}
+
+
+function pageReload() {
+  // This unfortunately comes before Google API CB is called
+  // (so we need to defer the action for displaying in showMenuDiv
+  // if it requires access to a google spreadsheet/doc)
+  var menuParam = getMenuParam('page');
+  if (!menuParam) {
+    menuParam = 'home';
+  }
+
+  let year = getYear();
+  setYear(year);
+
+  showMenuDiv(menuParam);
+}
+
+
+function jumpto(page) {
+  var path = window.location.pathname;
+  var url = path + '?page=' + page;
+  document.location.href = url;
 }
 
 
@@ -106,6 +105,26 @@ function setBanner() {
   if (bannerText) {
     document.getElementById('bannerwrapper').innerHTML = "<div id=\"bannerdiv\"><a id=\"bannerlink\" href=\"javascript:jumpto('events');\">" + bannerText + "</a></div>"
   }
+}
+
+
+function setYearDropdown() {
+  let select = document.getElementById("selectYear");
+  let seasons = [...yearSpreadSheetIDs.keys()]
+  select.options.length = 0
+  for (var i = 0; i < seasons.length; i++) {
+    var opt = seasons[i];
+    var el = document.createElement("option");
+    el.textContent = opt;
+    el.value = opt;
+    select.appendChild(el);
+  }
+  let year = localStorage.getItem("season");
+  if (!seasons.includes(year)) {
+    year = seasons[seasons.length - 1]
+    localStorage.setItem("season", year);
+  }
+  document.getElementById("selectYear").value = year;
 }
 
 
