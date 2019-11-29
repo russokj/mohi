@@ -101,7 +101,7 @@ function clearBanner() {
 
 function setBanner() {
   // TODO: Retrieve content from google
-  let bannerText = null
+  let bannerText = sessionStorage.getItem("banner");
   if (bannerText) {
     document.getElementById('bannerwrapper').innerHTML = "<div id=\"bannerdiv\"><a id=\"bannerlink\" href=\"javascript:jumpto('events');\">" + bannerText + "</a></div>"
   }
@@ -134,6 +134,7 @@ function nop() {
 
 
 function showHome() {
+  setBanner()
   let year = getYear()
   let photoID = getHomePagePhoto(year)
   let photoPath = "https://drive.google.com/uc?export=view&id=" + photoID
@@ -142,7 +143,6 @@ function showHome() {
 }
 
 function displayHome() {
-  setBanner()
   let year = getYear();
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' Home Page</center><div id="homeId" class="home">retrieving ...</div>'

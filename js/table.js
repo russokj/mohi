@@ -65,6 +65,10 @@ function initClientStage4() {
 }
 
 function initClientStage5() {
+    retrieveBanner()
+}
+
+function initClientStage6() {
     gapi_init = true
     initClientDone()
 }
@@ -179,7 +183,7 @@ function listArticles() {
 
 function listEvents() {
   let page = 'Events'
-  listTable(page, mainSpreadSheetID, 'events', 'eventsId', 'A3:C')
+  listTable(page, mainSpreadSheetID, 'events', 'eventsId', 'A7:C')
 }
 
 // TODO: WE DONT WANT THIS IN TABLE FORM
@@ -343,7 +347,7 @@ function retrieveRevisionID() {
     range: pageRange
   }).then(function(response) {
     let rows = response.result
-    if (rows.values.length > 0) {
+    if (rows.values  &&  rows.values.length > 0) {
       let entry = rows.values[0]
       let cookieID = entry[0]
       if (localStorage.getItem('cookieID') !== cookieID) {
@@ -359,6 +363,32 @@ function retrieveRevisionID() {
   }, function(reason) {
     alert('error: ' + reason.result.error.message)
     initClientStage2()
+  })
+}
+
+
+// TODO: Can this be cached??
+function retrieveBanner() {
+  let cells = 'A5'
+  let pagename = 'Events'
+  let pageRange = pagename + "!" + cells
+  gapi.client.sheets.spreadsheets.values.get({
+    spreadsheetId: mainSpreadSheetID,
+    key: MOHI_APIKEY,
+    range: pageRange
+  }).then(function(response) {
+    let rows = response.result
+    if (rows.values  &&  rows.values.length > 0) {
+      let entry = rows.values[0]
+      let banner = entry[0]
+      sessionStorage.setItem('banner', banner)
+    } else {
+      sessionStorage.setItem('banner', '')
+    }
+    initClientStage6()
+  }, function(reason) {
+    alert('error: ' + reason.result.error.message)
+    initClientStage6()
   })
 }
 
@@ -379,7 +409,7 @@ function retrieveYears() {
     }).then(function(response) {
       yearSpreadSheetIDs.clear()
       let rows = response.result
-      if (rows.values.length > 0) {
+      if (rows.values  &&  rows.values.length > 0) {
         let dataArray = new Array()
         for (row = 0; row < rows.values.length; row++) {
           let entry = rows.values[row]
