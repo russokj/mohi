@@ -335,7 +335,7 @@ function listTable(pagename, spreadSheetId, tableClass, tableId, range) {
 
 function retrieveRevisionID() {
   let cells = 'A6'
-  let pagename = 'Clear-Cookies'
+  let pagename = 'Clear-Cache'
   let pageRange = pagename + "!" + cells
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: mainSpreadSheetID,
