@@ -14,9 +14,11 @@ function showMenuDiv(menuID) {
     case "varsityroster": displayVarsityRoster(); break;
     case "jvroster": displayJvRoster(); break;
     case "croster": displayCRoster(); break;
+    case "droster": displayDRoster(); break;
     case "varsityschedule": displayVarsitySchedule(); break;
     case "jvschedule": displayJvSchedule(); break;
     case "cschedule": displayCSchedule(); break;
+    case "dschedule": displayDSchedule(); break;
     case "articles": displayArticles(); break;
     case "photos": displayPhotos(); break;
     case "coaches": displayCoaches(); break;
@@ -241,6 +243,14 @@ function displayCRoster() {
 }
 
 
+function displayDRoster() {
+  clearBanner()
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' D Team Roster</center><div id="rosterId" class="roster">retrieving ...</div>';
+  loadRoster('D', getYear());
+}
+
+
 function displayVarsitySchedule() {
   clearBanner()
   document.getElementById("menucontent").innerHTML =
@@ -262,6 +272,14 @@ function displayCSchedule() {
   document.getElementById("menucontent").innerHTML =
     '<center>' + getYear() + ' C Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
   loadSchedule('C', getYear());
+}
+
+
+function displayDSchedule() {
+  clearBanner()
+  document.getElementById("menucontent").innerHTML =
+    '<center>' + getYear() + ' D Team Schedule</center><div id="scheduleId" class="schedule">retrieving ...</div>';
+  loadSchedule('D', getYear());
 }
 
 
@@ -297,5 +315,5 @@ function displayWebsite() {
 
 
 function displayUnknown() {
-  document.getElementById("menucontent").innerHTML = 'Coming Soon!';
+  document.getElementById("menucontent").innerHTML = 'Not Available';
 }
