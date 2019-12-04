@@ -102,10 +102,9 @@ function clearBanner() {
 }
 
 function setBanner() {
-  // TODO: Retrieve content from google
-  let bannerText = sessionStorage.getItem("banner");
-  if (bannerText) {
-    document.getElementById('bannerwrapper').innerHTML = "<div id=\"bannerdiv\"><a id=\"bannerlink\" href=\"javascript:jumpto('events');\">" + bannerText + "</a></div>"
+  let banner = new Map(JSON.parse(sessionStorage.getItem('banner')))
+  if (banner.get('text') && banner.get('page')) {
+    document.getElementById('bannerwrapper').innerHTML = "<div id=\"bannerdiv\"><a id=\"bannerlink\" href=\"javascript:jumpto('" + banner.get('page') + "');\">" + banner.get('text') + "</a></div>"
   }
 }
 

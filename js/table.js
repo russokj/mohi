@@ -181,9 +181,10 @@ function listArticles() {
   listLinkTable(page, mainSpreadSheetID, 'article', 'articleId', 'A3:D', 2, 4)
 }
 
+// TODO: Events & Articles seem to not have a bold title with black background (coaches too)
 function listEvents() {
   let page = 'Events'
-  listTable(page, mainSpreadSheetID, 'events', 'eventsId', 'A7:C')
+  listTable(page, mainSpreadSheetID, 'events', 'eventsId', 'A4:C')
 }
 
 // TODO: WE DONT WANT THIS IN TABLE FORM
@@ -369,9 +370,10 @@ function retrieveRevisionID() {
 
 // TODO: Can this be cached??
 function retrieveBanner() {
-  let cells = 'A5'
-  let pagename = 'Events'
+  let cells = 'A6:B6'
+  let pagename = 'Banner'
   let pageRange = pagename + "!" + cells
+  let banner = new Map()
   gapi.client.sheets.spreadsheets.values.get({
     spreadsheetId: mainSpreadSheetID,
     key: MOHI_APIKEY,
@@ -380,14 +382,14 @@ function retrieveBanner() {
     let rows = response.result
     if (rows.values  &&  rows.values.length > 0) {
       let entry = rows.values[0]
-      let banner = entry[0]
-      sessionStorage.setItem('banner', banner)
-    } else {
-      sessionStorage.setItem('banner', '')
+      banner.set('text', entry[0])
+      banner.set('page', entry[1])
     }
+    sessionStorage.setItem('banner', JSON.stringify(Array.from(banner)))
     initClientStage6()
   }, function(reason) {
     alert('error: ' + reason.result.error.message)
+    sessionStorage.setItem('banner', JSON.stringify(Array.from(banner)))
     initClientStage6()
   })
 }
@@ -396,7 +398,7 @@ function retrieveBanner() {
 function retrieveYears() {
   // Get list of seasons and the spreadsheet IDs associated with each
   if (localStorage.getItem('yearSpreadSheetIDs')) {
-    yearSpreadSheetIDs = new Map(JSON.parse(localStorage.getItem('yearSpreadSheetIDs')));
+    yearSpreadSheetIDs = new Map(JSON.parse(localStorage.getItem('yearSpreadSheetIDs')))
     initClientStage3()
   } else {
     let cells = 'A8:B'
