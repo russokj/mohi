@@ -2,23 +2,28 @@
 const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",
                         "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
 
+// TODO: constants should be capitalized or something; localstorage & sessionstorage  names should be constants and distinguishiable as should globals
+
 const MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
+const MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
 const PHOTO_FOLDER_ID = "'1zoSGrQTMX10X99eB71ORTaPMWeih_CL3'"
+
+// Main spreadsheet contains data that isn't year specific
+const mainSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',
                 'https://www.googleapis.com/auth/drive.readonly']
 
-// TODO: default season - is this needed? default spreadsheet id - what is this for?
-let yearSpreadSheetIDs = new Map()
 const DEFAULT_SEASON = '2016-2017'
 const DEFAULT_SPREADSHEET_ID = '1mE65wuB4JSKGjC0fQK45InFoIiNtCynUNVo4BJ5r3NI'
-
 
 // flag to delay loading of page if it needs to retrieve data from google
 let gapi_init = false
 let delayedPageLoadCB = null
+
+let yearSpreadSheetIDs = new Map()
 let photoYearFolderIDs = new Map()
 
 
@@ -79,13 +84,6 @@ function initClientDone() {
     delayedPageLoadCB = null
   }
 }
-
-
-// Spreadsheets that are independent of the year
-// (note: these currently reference a single spreadsheet that has multiple tabs.  The variables here are just to
-//        give extra flexibility in case the tabs are turned into their own spreadsheets.)
-// TODO: constants should be capitalized or something; localstorage & sessionstorage  names should be constants and distinguishiable as should globals
-let mainSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
 
 
 function loadHome(homeHandler) {
@@ -170,7 +168,7 @@ function listSchedule(team, year) {
   listTable(page, yearSpreadSheetIDs.get(year), 'schedule', 'scheduleId', 'A1:G')
 }
 
-// TODO: Make links for email/website
+// TODO: Make links for email/website so they are clickable
 function listAdmin() {
   let page = 'Contacts-Admin'
   listTable(page, mainSpreadSheetID, 'admin', 'adminId', 'A3:D')
@@ -187,7 +185,7 @@ function listEvents() {
   listTable(page, mainSpreadSheetID, 'events', 'eventsId', 'A4:C')
 }
 
-// TODO: WE DONT WANT THIS IN TABLE FORM
+// TODO: We probably don't want this in table form
 function listCoaches() {
   let page = 'Contacts-Coaches'
   listTable(page, mainSpreadSheetID, 'coaches', 'coachesId', 'A3:D')
@@ -433,14 +431,6 @@ function retrieveYears() {
   }
 }
 
-
-let MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
-// TODO: move to photos file?
-// Remove the need for a spreadsheet to do this but add documentation about the directory names
-// When photos are selected, index into map to get ID, if nothing found print appropriate error
-// Get list of files (want the URL list this time).  Then run periodic update and randomly select a photo to display
-// https://drive.google.com/uc?export=view&id=
-// FUTURE: fade in and out
 
 function retrievePhotoFolderIds() {
   photoYearFolderIDs.clear()

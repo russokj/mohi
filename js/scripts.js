@@ -156,13 +156,12 @@ function clearPhotoTimer() {
     photoTimeoutID = null
 }
 
+// TODO: Add fade in and out (is this CSS code?)
 function showPhotos() {
   if (photoTimeoutID) {
     clearPhotoTimer()
   }
 
-  // TODO: If year changes, need to clear photo list so we re-retrieve it
-  // What if there are no files? Can we clear all associated lists on year change?
   let year = getYear()
   let photoList = getPhotoList(year)
   let photoCnt = photoList.length
