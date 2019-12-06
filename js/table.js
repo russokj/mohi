@@ -2,14 +2,22 @@
 const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4",
                         "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
 
-// TODO: constants should be capitalized or something; localstorage & sessionstorage  names should be constants and distinguishiable as should globals
+// Cached content from google drive that are permanently stored on the local device
+const LOCALSTORE_REVISION_ID = 'revisionID'
+const LOCALSTORE_YEAR_SPREADSHEET_IDS = 'yearSpreadSheetIDs'
+const LOCALSTORE_PHOTO_YEAR_FOLDER_IDS = 'photoYearFolderIDs'
+
+// Cached content from google drive that are stored as long as the browser is running
+const SESSIONSTORE_HOME_PHOTO_ID_PREFIX = 'homePhotoID_'
+const SESSIONSTORE_PHOTO_IDS_PREFIX = 'photoIDs_'
+const SESSIONSTORE_BANNER = 'banner'
 
 const MOHI_APIKEY = 'AIzaSyAF7M4rFbRQnh0L62aO3ANRT9bSqciBobw'
 const MOHI_DRIVE_APIKEY= 'AIzaSyACWPr-jLvJeYPVEawCCfWsP_uzHE2xuNQ'
 const PHOTO_FOLDER_ID = "'1zoSGrQTMX10X99eB71ORTaPMWeih_CL3'"
 
 // Main spreadsheet contains data that isn't year specific
-const mainSpreadSheetID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
+const MAIN_SPREADSHEET_ID = '1CCEfoIFaT4vt0jE6BusGqaK_EuTOzU1hqUNozylIh6g'
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
@@ -171,24 +179,24 @@ function listSchedule(team, year) {
 // TODO: Make links for email/website so they are clickable
 function listAdmin() {
   let page = 'Contacts-Admin'
-  listTable(page, mainSpreadSheetID, 'admin', 'adminId', 'A3:D')
+  listTable(page, MAIN_SPREADSHEET_ID, 'admin', 'adminId', 'A3:D')
 }
 
 function listArticles() {
   let page = 'Articles'
-  listLinkTable(page, mainSpreadSheetID, 'article', 'articleId', 'A3:D', 2, 4)
+  listLinkTable(page, MAIN_SPREADSHEET_ID, 'article', 'articleId', 'A3:D', 2, 4)
 }
 
 // TODO: Events & Articles seem to not have a bold title with black background (coaches too)
 function listEvents() {
   let page = 'Events'
-  listTable(page, mainSpreadSheetID, 'events', 'eventsId', 'A4:C')
+  listTable(page, MAIN_SPREADSHEET_ID, 'events', 'eventsId', 'A4:C')
 }
 
 // TODO: We probably don't want this in table form
 function listCoaches() {
   let page = 'Contacts-Coaches'
-  listTable(page, mainSpreadSheetID, 'coaches', 'coachesId', 'A3:D')
+  listTable(page, MAIN_SPREADSHEET_ID, 'coaches', 'coachesId', 'A3:D')
 }
 
 function listWebsiteContact() {
@@ -196,7 +204,7 @@ function listWebsiteContact() {
   let pageName = 'Contacts-Other'
   let pageRange = String(pageName) + "!" + range
   gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: mainSpreadSheetID,
+    spreadsheetId: MAIN_SPREADSHEET_ID,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
@@ -341,18 +349,18 @@ function retrieveRevisionID() {
   let pagename = 'Clear-Cache'
   let pageRange = pagename + "!" + cells
   gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: mainSpreadSheetID,
+    spreadsheetId: MAIN_SPREADSHEET_ID,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
     let rows = response.result
     if (rows.values  &&  rows.values.length > 0) {
       let entry = rows.values[0]
-      let cookieID = entry[0]
-      if (localStorage.getItem('cookieID') !== cookieID) {
-        localStorage.removeItem('yearSpreadSheetIDs')
-        localStorage.removeItem('photoYearFolderIDs')
-        localStorage.setItem('cookieID', cookieID)
+      let revisionID = entry[0]
+      if (localStorage.getItem(LOCALSTORE_REVISION_ID) !== revisionID) {
+        localStorage.removeItem(LOCALSTORE_YEAR_SPREADSHEET_IDS)
+        localStorage.removeItem(LOCALSTORE_PHOTO_YEAR_FOLDER_IDS)
+        localStorage.setItem(LOCALSTORE_REVISION_ID, revisionID)
       }
     } else {
       yearSpreadSheetIDs.clear()
@@ -373,7 +381,7 @@ function retrieveBanner() {
   let pageRange = pagename + "!" + cells
   let banner = new Map()
   gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: mainSpreadSheetID,
+    spreadsheetId: MAIN_SPREADSHEET_ID,
     key: MOHI_APIKEY,
     range: pageRange
   }).then(function(response) {
@@ -383,11 +391,11 @@ function retrieveBanner() {
       banner.set('text', entry[0])
       banner.set('page', entry[1])
     }
-    sessionStorage.setItem('banner', JSON.stringify(Array.from(banner)))
+    sessionStorage.setItem(SESSIONSTORE_BANNER, JSON.stringify(Array.from(banner)))
     initClientStage6()
   }, function(reason) {
     alert('error: ' + reason.result.error.message)
-    sessionStorage.setItem('banner', JSON.stringify(Array.from(banner)))
+    sessionStorage.setItem(SESSIONSTORE_BANNER, JSON.stringify(Array.from(banner)))
     initClientStage6()
   })
 }
@@ -395,15 +403,15 @@ function retrieveBanner() {
 
 function retrieveYears() {
   // Get list of seasons and the spreadsheet IDs associated with each
-  if (localStorage.getItem('yearSpreadSheetIDs')) {
-    yearSpreadSheetIDs = new Map(JSON.parse(localStorage.getItem('yearSpreadSheetIDs')))
+  if (localStorage.getItem(LOCALSTORE_YEAR_SPREADSHEET_IDS)) {
+    yearSpreadSheetIDs = new Map(JSON.parse(localStorage.getItem(LOCALSTORE_YEAR_SPREADSHEET_IDS)))
     initClientStage3()
   } else {
     let cells = 'A8:B'
     let pagename = 'Seasons'
     let pageRange = pagename + "!" + cells
     gapi.client.sheets.spreadsheets.values.get({
-      spreadsheetId: mainSpreadSheetID,
+      spreadsheetId: MAIN_SPREADSHEET_ID,
       key: MOHI_APIKEY,
       range: pageRange
     }).then(function(response) {
@@ -419,7 +427,7 @@ function retrieveYears() {
           let id = link.split("/")[5]
           yearSpreadSheetIDs.set(season, id)
         }
-        localStorage.setItem('yearSpreadSheetIDs', JSON.stringify(Array.from(yearSpreadSheetIDs)))
+        localStorage.setItem(LOCALSTORE_YEAR_SPREADSHEET_IDS, JSON.stringify(Array.from(yearSpreadSheetIDs)))
       } else {
         yearSpreadSheetIDs.set(DEFAULT_SEASON, DEFAULT_SPREADSHEET_ID)
       }
@@ -434,7 +442,7 @@ function retrieveYears() {
 
 function retrievePhotoFolderIds() {
   photoYearFolderIDs.clear()
-  let photoYearFolderIDsJSON = localStorage.getItem('photoYearFolderIDs')
+  let photoYearFolderIDsJSON = localStorage.getItem(LOCALSTORE_PHOTO_YEAR_FOLDER_IDS)
   if (photoYearFolderIDsJSON) {
     let photoYearFolderIDsArr = JSON.parse(photoYearFolderIDsJSON)
     if (photoYearFolderIDsArr.length > 0) {
@@ -462,7 +470,7 @@ function retrievePhotoFolderIds() {
       console.log('No seasons found for photos.')
     }
     photoYearFolderIDsJSON = JSON.stringify(Array.from(photoYearFolderIDs))
-    localStorage.setItem('photoYearFolderIDs', photoYearFolderIDsJSON)
+    localStorage.setItem(LOCALSTORE_PHOTO_YEAR_FOLDER_IDS, photoYearFolderIDsJSON)
     initClientStage4()
   }, function(response) {
     console.log(response)
@@ -479,8 +487,8 @@ function retrievePhotosIds() {
 
   // See if we already retrieved the home photo ID and list of photos for the season
   let photoIDs = []
-  let homePhotoID = sessionStorage.getItem('homePhotoID_' + season)
-  let photoIDsJSON = sessionStorage.getItem('photoIDs_' + season)
+  let homePhotoID = sessionStorage.getItem(SESSIONSTORE_HOME_PHOTO_ID_PREFIX + season)
+  let photoIDsJSON = sessionStorage.getItem(SESSIONSTORE_PHOTO_IDS_PREFIX + season)
   if (photoIDsJSON) {
     photoIDs = JSON.parse(photoIDsJSON)
   }
@@ -508,16 +516,20 @@ function retrievePhotosIds() {
     if (results && results.length > 0) {
       for (let i = 0; i < results.length; i++) {
         photoIDs.push(results[i].id)
-        if (results[i].name === 'home.jpg') {
+        if (results[i].name.toLowerCase() === 'home.jpg') {
           homePhotoID = results[i].id
         }
       }
     } else {
       console.log('No photos found for season ' + season)
     }
-    sessionStorage.setItem('homePhotoID_' + season, homePhotoID)
+    if (homePhotoID) {
+      sessionStorage.setItem(SESSIONSTORE_HOME_PHOTO_ID_PREFIX + season, homePhotoID)
+    } else {
+      sessionStorage.removeItem(SESSIONSTORE_HOME_PHOTO_ID_PREFIX + season)
+    }
     photoIDsJSON = JSON.stringify(photoIDs)
-    sessionStorage.setItem('photoIDs_' + season, photoIDsJSON)
+    sessionStorage.setItem(SESSIONSTORE_PHOTO_IDS_PREFIX + season, photoIDsJSON)
     initClientStage5()
   }, function(response) {
     console.log(response)
@@ -528,7 +540,7 @@ function retrievePhotosIds() {
 
 function getPhotoList(season) {
   let photoIDs = []
-  let photoIDsJSON = sessionStorage.getItem('photoIDs_' + season)
+  let photoIDsJSON = sessionStorage.getItem(SESSIONSTORE_PHOTO_IDS_PREFIX + season)
   if (photoIDsJSON) {
     photoIDs = JSON.parse(photoIDsJSON)
   }
@@ -536,6 +548,6 @@ function getPhotoList(season) {
 }
 
 function getHomePagePhoto(season) {
-  let homePhotoID = sessionStorage.getItem('homePhotoID_' + season)
+  let homePhotoID = sessionStorage.getItem(SESSIONSTORE_HOME_PHOTO_ID_PREFIX + season)
   return homePhotoID
 }

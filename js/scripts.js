@@ -3,6 +3,11 @@ let photoTimeoutID = null;
 let imageIdx = -1;
 let preLoadedImages = new Array();
 
+// Cached content from google drive that are permanently stored on the local device
+// TODO: Both of these (SESSIOBNSTORE_BANNER) should have functions in table.js (or some new file) for setting/getting!
+//       see existing getPhotoList, getHomePagePhoto
+const LOCALSTORE_SEASON = 'season'
+
 
 // Called when user selects a new year
 function showMenuDiv(menuID) {
@@ -82,16 +87,16 @@ function setYear(year) {
   let element = document.getElementById("selectYear");
   let changed = element.value != year;
   element.value = year;
-  localStorage.setItem("season", year);
+  localStorage.setItem(LOCALSTORE_SEASON, year);
   return changed;
 }
 
 
 function getYear() {
-  let year = localStorage.getItem("season");
+  let year = localStorage.getItem(LOCALSTORE_SEASON);
   if (!year || year === '') {
     year = document.getElementById("selectYear").value;
-    localStorage.setItem("season", year);
+    localStorage.setItem(LOCALSTORE_SEASON, year);
   }
   return year;
 }
@@ -102,7 +107,7 @@ function clearBanner() {
 }
 
 function setBanner() {
-  let banner = new Map(JSON.parse(sessionStorage.getItem('banner')))
+  let banner = new Map(JSON.parse(sessionStorage.getItem(SESSIONSTORE_BANNER)))
   if (banner.get('text') && banner.get('page')) {
     document.getElementById('bannerwrapper').innerHTML = "<div id=\"bannerdiv\"><a id=\"bannerlink\" href=\"javascript:jumpto('" + banner.get('page') + "');\">" + banner.get('text') + "</a></div>"
   }
@@ -120,10 +125,10 @@ function setYearDropdown() {
     el.value = opt;
     select.appendChild(el);
   }
-  let year = localStorage.getItem("season");
+  let year = localStorage.getItem(LOCALSTORE_SEASON);
   if (!seasons.includes(year)) {
     year = seasons[seasons.length - 1]
-    localStorage.setItem("season", year);
+    localStorage.setItem(LOCALSTORE_SEASON, year);
   }
   document.getElementById("selectYear").value = year;
 }
@@ -138,8 +143,13 @@ function showHome() {
   setBanner()
   let year = getYear()
   let photoID = getHomePagePhoto(year)
-  let photoPath = "https://drive.google.com/uc?export=view&id=" + photoID
-  let innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">'
+  let innerHtml
+  if (photoID) {
+    let photoPath = "https://drive.google.com/uc?export=view&id=" + photoID
+    innerHtml = '<img class="photoGallary" src="' + photoPath + '", style="width:100%">'
+  } else {
+    innerHtml = '<div id="homeId" class="home">Cannot find the home page image for ' + getYear() + '</div>'
+  }
   document.getElementById("menucontent").innerHTML = innerHtml
 }
 
