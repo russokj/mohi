@@ -6,6 +6,7 @@ const DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v
 const LOCALSTORE_REVISION_ID = 'revisionID'
 const LOCALSTORE_YEAR_SPREADSHEET_IDS = 'yearSpreadSheetIDs'
 const LOCALSTORE_PHOTO_YEAR_FOLDER_IDS = 'photoYearFolderIDs'
+const LOCALSTORE_SEASON = 'season'
 
 // Cached content from google drive that are stored as long as the browser is running
 const SESSIONSTORE_HOME_PHOTO_ID_PREFIX = 'homePhotoID_'
@@ -550,4 +551,18 @@ function getPhotoList(season) {
 function getHomePagePhoto(season) {
   let homePhotoID = sessionStorage.getItem(SESSIONSTORE_HOME_PHOTO_ID_PREFIX + season)
   return homePhotoID
+}
+
+function getBanner() {
+  let banner = new Map(JSON.parse(sessionStorage.getItem(SESSIONSTORE_BANNER)))
+  return banner
+}
+
+function setCurrentSeason(year) {
+  localStorage.setItem(LOCALSTORE_SEASON, year)
+}
+
+function getCurrentSeason() {
+  let year = localStorage.getItem(LOCALSTORE_SEASON)
+  return year
 }
